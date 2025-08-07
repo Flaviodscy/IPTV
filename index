@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; cursor: none; }
+        
+        .video-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+        }
+        
+        video {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .info.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="player" autoplay muted playsinline></video>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div id="loadingText">Starting...</div>
+    </div>
+    
+    <div class="info" id="info"></div>
+
+    <script>
+        // Your Google Apps Script Web App URL
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx4c3oLvZpx-B5cAFm8nk4glC8g5FJBvNS__ZGaqQCmdJq9fObSRlLUKwhhxQgiYx9N/exec";
+        
+        const player = document.getElementById('player');
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const info = document.getElementById('info');
+        
+        let hls = null;
+        let currentUrl = "";
+        let retryCount = 0;
+        const MAX_RETRIES = 5;
+
+        function showLoading(text = "Loading...") {
+            loadingText.textContent = text;
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        function showInfo(text) {
+            info.textContent = text;
+            info.classList.add('show');
+            setTimeout(() => info.classList.remove('show'), 4000);
+        }
+
+        async function getChannelFromGAS() {
+            try {
+                showLoading("Connecting to data source...");
+                console.log('Fetching from GAS:', GAS_URL);
+                
+                const response = await fetch(`${GAS_URL}?action=getChannel&t=${Date.now()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('GAS Response:', data);
+                
+                if (data.success) {
+                    return { channel: data.channel, url: data.url };
+                } else {
+                    console.log('GAS returned error:', data.error);
+                    // Still return the fallback data from GAS
+                    return { channel: data.channel, url: data.url };
+                }
+                
+            } catch (error) {
+                console.error('GAS fetch error:', error);
+                showLoading("Connection failed - using default");
+                
+                // Ultimate fallback
+                return { 
+                    channel: 'News', 
+                    url: 'https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/Video-2Mbps.m3u8'
+                };
+            }
+        }
+
+        function playStream(url, channelName) {
+            if (!url || url.trim() === "") {
+                console.error('No URL to play');
+                showLoading("No stream URL available");
+                return;
+            }
+
+            showLoading(`Loading ${channelName}...`);
+            showInfo(`Loading ${channelName}`);
+            console.log('Playing:', channelName, url);
+
+            // Clean up previous stream
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+
+            if (Hls.isSupported()) {
+                hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: false,
+                    backBufferLength: 30,
+                    maxBufferLength: 60,
+                    startLevel: -1
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(player);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    console.log('Stream ready:', channelName);
+                    player.play().then(() => {
+                        hideLoading();
+                        showInfo(`${channelName} - Playing`);
+                        retryCount = 0; // Reset retry count on success
+                        console.log('Playback started:', channelName);
+                    }).catch(err => {
+                        console.error('Autoplay failed:', err);
+                        hideLoading();
+                        showInfo(`${channelName} - Ready (click to play)`);
+                        
+                        // Try autoplay again after a delay
+                        setTimeout(() => {
+                            player.play().catch(() => {
+                                console.log('Second autoplay attempt failed');
+                            });
+                        }, 2000);
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS Error:', data.type, data.details);
+                    
+                    if (data.fatal) {
+                        retryCount++;
+                        if (retryCount <= MAX_RETRIES) {
+                            showInfo(`${channelName} - Error, retrying... (${retryCount}/${MAX_RETRIES})`);
+                            console.log(`Retrying stream ${retryCount}/${MAX_RETRIES} in 5 seconds...`);
+                            
+                            setTimeout(() => {
+                                playStream(url, channelName);
+                            }, 5000);
+                        } else {
+                            showInfo(`${channelName} - Stream failed after ${MAX_RETRIES} attempts`);
+                            showLoading("Stream failed - checking for updates...");
+                            retryCount = 0;
+                            
+                            // Try getting a fresh URL after extended delay
+                            setTimeout(updateChannel, 30000);
+                        }
+                    }
+                });
+
+            } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari/iOS fallback
+                console.log('Using Safari HLS for:', channelName);
+                player.src = url;
+                
+                player.addEventListener('loadedmetadata', () => {
+                    player.play().then(() => {
+                        hideLoading();
+                        showInfo(`${channelName} - Playing`);
+                        retryCount = 0;
+                    }).catch(err => {
+                        console.error('Safari playback failed:', err);
+                        showInfo(`${channelName} - Playback failed`);
+                    });
+                });
+                
+            } else {
+                console.error('HLS not supported');
+                showLoading("Browser not supported for HLS streaming");
+                showInfo("HLS streaming not supported in this browser");
+            }
+        }
+
+        async function updateChannel() {
+            try {
+                console.log('Checking for channel updates...');
+                const { channel, url } = await getChannelFromGAS();
+                
+                if (url && url !== currentUrl) {
+                    console.log('Channel update detected:', channel, url);
+                    currentUrl = url;
+                    playStream(url, channel);
+                } else {
+                    console.log('No channel change detected');
+                }
+                
+            } catch (error) {
+                console.error('Update failed:', error);
+                showInfo('Update check failed');
+            }
+        }
+
+        // Initialize
+        console.log('IPTV Player starting...');
+        console.log('GAS URL:', GAS_URL);
+        
+        // Check if GAS_URL is configured
+        if (GAS_URL.includes('YOUR_SCRIPT_ID')) {
+            showLoading('Please configure GAS_URL in the code');
+            showInfo('Configuration needed: Replace YOUR_SCRIPT_ID with actual Google Apps Script URL');
+            return;
+        }
+        
+        // Start the player
+        updateChannel();
+        
+        // Check for updates every 5 seconds
+        setInterval(updateChannel, 5000);
+        
+        // Health check every 30 seconds
+        setInterval(() => {
+            if (player.readyState === 0 && currentUrl) {
+                console.log('Health check failed, restarting...');
+                showInfo('Connection lost - restarting...');
+                const currentChannel = info.textContent?.split(' - ')[0] || 'Stream';
+                playStream(currentUrl, currentChannel);
+            }
+        }, 30000);
+
+        // Video event listeners
+        player.addEventListener('error', (e) => {
+            console.error('Video error:', e);
+            showInfo('Video error - restarting...');
+            setTimeout(() => {
+                if (currentUrl) {
+                    const currentChannel = info.textContent?.split(' - ')[0] || 'Stream';
+                    playStream(currentUrl, currentChannel);
+                }
+            }, 3000);
+        });
+
+        // Manual play on click
+        player.addEventListener('click', () => {
+            if (player.paused && currentUrl) {
+                player.play().catch(err => {
+                    console.error('Manual play failed:', err);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
