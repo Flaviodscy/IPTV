@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; cursor: none; }
+        
+        .video-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+        }
+        
+        .video-container video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .channel-info {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .channel-info.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="player" autoplay muted playsinline></video>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Loading Stream...</div>
+    </div>
+    
+    <div class="channel-info" id="channelInfo">
+        <div id="channelName">News</div>
+    </div>
+
+    <script>
+        // REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
+        
+        const CHANNELS = {
+            "News": "https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/Video-2Mbps.m3u8",
+            "Sports": "http://fl5.moveonjoy.com/TSN_5/index.m3u8",
+            "Cooking": "https://gusto-xumo.amagi.tv/playlist.m3u8",
+            "Nature": "https://aegis-cloudfront-1.tubi.video/dc8bda97-ce9e-4091-b4e8-11254dea4da6/playlist.m3u8",
+            "Kids": "https://fl2.moveonjoy.com/DISNEY_JR/index.m3u8"
+        };
+        
+        const player = document.getElementById('player');
+        const loading = document.getElementById('loading');
+        const channelInfo = document.getElementById('channelInfo');
+        const channelName = document.getElementById('channelName');
+        
+        let hls = null;
+        let currentUrl = "";
+        let fallbackMode = false;
+
+        function showLoading() {
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        function showChannelInfo(channel) {
+            channelName.textContent = channel;
+            channelInfo.classList.add('show');
+            setTimeout(() => channelInfo.classList.remove('show'), 3000);
+        }
+
+        async function getCurrentChannel() {
+            try {
+                const response = await fetch(`${GAS_URL}?action=getChannel&t=${Date.now()}`);
+                const data = await response.json();
+                return { channel: data.channel, url: data.url };
+            } catch (error) {
+                console.error('GAS fetch failed, using fallback mode');
+                fallbackMode = true;
+                // Default to News if GAS fails
+                return { channel: "News", url: CHANNELS["News"] };
+            }
+        }
+
+        function playStream(url, channel) {
+            showLoading();
+            showChannelInfo(channel);
+
+            // Clean up previous stream
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+
+            if (Hls.isSupported()) {
+                hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: false,
+                    backBufferLength: 30,
+                    maxBufferLength: 60
+                });
+
+                hls.loadSource(url);
+                hls.attachMedia(player);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    player.play().then(() => {
+                        hideLoading();
+                        console.log(`Playing: ${channel}`);
+                    }).catch(err => {
+                        console.error('Autoplay failed:', err);
+                        hideLoading();
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        console.error('HLS Error:', data.type);
+                        setTimeout(() => {
+                            console.log('Retrying stream...');
+                            playStream(url, channel);
+                        }, 5000);
+                    }
+                });
+
+            } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari fallback
+                player.src = url;
+                player.play().then(() => {
+                    hideLoading();
+                }).catch(err => {
+                    console.error('Safari playback failed:', err);
+                    hideLoading();
+                });
+            }
+        }
+
+        async function updateChannel() {
+            try {
+                const { channel, url } = await getCurrentChannel();
+                
+                if (url && url !== currentUrl) {
+                    console.log(`Channel change: ${channel} - ${url}`);
+                    currentUrl = url;
+                    playStream(url, channel);
+                }
+            } catch (error) {
+                console.error('Update failed:', error);
+            }
+        }
+
+        // Initialize
+        console.log('IPTV Player starting...');
+        updateChannel();
+        
+        // Check for updates every 5 seconds
+        setInterval(updateChannel, 5000);
+        
+        // Health check every 30 seconds
+        setInterval(() => {
+            if (player.readyState === 0 && currentUrl) {
+                console.log('Health check failed, restarting...');
+                playStream(currentUrl, channelName.textContent);
+            }
+        }, 30000);
+
+        // Error recovery
+        player.addEventListener('error', () => {
+            console.error('Video error, restarting...');
+            setTimeout(() => {
+                if (currentUrl) {
+                    playStream(currentUrl, channelName.textContent);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
