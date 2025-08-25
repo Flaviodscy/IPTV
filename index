@@ -1,309 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; overflow: hidden; cursor: none; }
-        
-        .video-container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: #000;
-        }
-        
-        video {
-            width: 100%; 
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .loading {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            z-index: 10;
-        }
-        
-        .spinner {
-            width: 50px; height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .info {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            z-index: 20;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .info.show { opacity: 1; }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Us — Journey</title>
+<meta name="theme-color" content="#ffffff" />
+<style>
+  :root{
+    --bg:#f9fafc; --card:#ffffff; --ink:#182033; --muted:#77819b; --line:#e9edf6;
+    --brand:#6ee7b7; --brand2:#93c5fd; --coral:#ffb4a8; --lilac:#c7b4ff; --gold:#f8d26a;
+    --ok:#4ad69a; --warn:#f7b267; --bad:#ff7b7b;
+    --r:16px; --shadow:0 8px 24px rgba(0,0,0,.06); --bar:64px; --fab:64px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink); background:var(--bg);
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  }
+  /* top */
+  .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:12px 14px;background:linear-gradient(180deg,#fff,#ffffffcc);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+  .brand{display:flex;gap:10px;align-items:center}
+  .logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+  h1{margin:0;font-size:18px}
+  .muted{color:var(--muted);font-size:12px}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 14px;font-weight:700}
+  .btn.ghost{background:#fff}
+  .btn.fill{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#053}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;background:#fff}
+
+  /* content */
+  .wrap{padding:12px 12px calc(var(--bar)+24px)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
+  .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;outline:none}
+  textarea{min-height:90px;resize:vertical}
+  .empty{color:#8fa0bd;text-align:center;padding:16px}
+
+  /* journey dots */
+  .journey{display:flex;gap:10px;overflow:auto;padding:4px}
+  .step{min-width:120px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+  .step.locked{opacity:.55}
+  .step .lvl{font-weight:900}
+  .step .xp{font-size:12px;color:#5a6b8c}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;background:#eef6ff;border:1px solid var(--line)}
+
+  /* feed / list */
+  .item{display:flex;gap:10px;padding:12px;border-radius:12px;background:#fff;border:1px solid var(--line)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .type-app .dot{background:var(--ok)}
+  .type-wish .dot{background:var(--coral)}
+  .type-debate .dot{background:var(--lilac)}
+  .meta{color:#7b88a6;font-size:12px;margin-top:6px}
+
+  /* bottom nav */
+  .nav{position:fixed;bottom:0;inset-inline:0;height:var(--bar);display:flex;justify-content:space-around;align-items:center;
+    background:#fff;border-top:1px solid var(--line);z-index:20}
+  .tab{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#6a7696;font-size:11px}
+  .tab.active{color:#1a1d2b;font-weight:800}
+  .ico{font-size:20px;line-height:1}
+
+  /* fab */
+  .fab{position:fixed;right:16px;bottom:calc(var(--bar)+16px);width:var(--fab);height:var(--fab);border-radius:50%;
+    background:linear-gradient(135deg,var(--brand),var(--brand2));color:#063;border:none;font-size:30px;font-weight:900;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+
+  /* sheet */
+  .backdrop{position:fixed;inset:0;display:none;background:rgba(0,0,0,.2);backdrop-filter:blur(6px);align-items:flex-end;z-index:30}
+  .sheet{width:100%;border-top-left-radius:18px;border-top-right-radius:18px;background:#fff;border-top:1px solid var(--line);padding:14px 12px 18px}
+  .show{display:flex}
+
+  /* toast */
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar)+var(--fab)+12px);background:#fff;border:1px solid var(--line);
+    color:#173; padding:10px 14px;border-radius:999px;display:none;z-index:40;box-shadow:var(--shadow)}
+  .toast.show{display:block}
+</style>
 </head>
 <body>
-    <div class="video-container">
-        <video id="player" autoplay muted playsinline></video>
+  <div class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Us — Journey</h1>
+        <div class="muted" id="status">Demo • light</div>
+      </div>
     </div>
-    
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div id="loadingText">Starting...</div>
+    <div class="row">
+      <button class="btn ghost" id="settingsBtn">⚙️</button>
     </div>
-    
-    <div class="info" id="info"></div>
+  </div>
 
-    <script>
-        // Your Google Apps Script Web App URL
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbx4c3oLvZpx-B5cAFm8nk4glC8g5FJBvNS__ZGaqQCmdJq9fObSRlLUKwhhxQgiYx9N/exec";
-        
-        const player = document.getElementById('player');
-        const loading = document.getElementById('loading');
-        const loadingText = document.getElementById('loadingText');
-        const info = document.getElementById('info');
-        
-        let hls = null;
-        let currentUrl = "";
-        let retryCount = 0;
-        const MAX_RETRIES = 5;
+  <main class="wrap">
+    <!-- Journey -->
+    <section id="screen-journey">
+      <div class="card">
+        <div class="title">
+          <strong>Journey</strong>
+          <span class="badge" id="xpBadge">XP 0 • Streak 0🔥</span>
+        </div>
+        <div class="journey" id="journeyStrip"></div>
+      </div>
 
-        function showLoading(text = "Loading...") {
-            loadingText.textContent = text;
-            loading.style.display = 'block';
-        }
+      <div class="card">
+        <div class="title">
+          <strong>Activity feed</strong>
+          <span class="chip">+1 app • +2 wish • +3 win</span>
+        </div>
+        <div id="feed"><div class="empty">No activity yet. Tap <b>＋</b> to start a challenge.</div></div>
+      </div>
+    </section>
 
-        function hideLoading() {
-            loading.style.display = 'none';
-        }
+    <!-- Daily Challenge -->
+    <section id="screen-daily" style="display:none">
+      <div class="card">
+        <div class="title"><strong>Daily Challenge</strong><span class="chip" id="dailyChip"></span></div>
+        <div class="item" style="align-items:flex-start">
+          <div class="dot" style="background:var(--gold)"></div>
+          <div style="flex:1">
+            <div id="dailyText">Loading…</div>
+            <div class="meta" id="dailyMeta"></div>
+          </div>
+          <button class="btn fill" id="completeDaily">Complete</button>
+        </div>
+      </div>
 
-        function showInfo(text) {
-            info.textContent = text;
-            info.classList.add('show');
-            setTimeout(() => info.classList.remove('show'), 4000);
-        }
+      <div class="card">
+        <div class="title"><strong>Quick Add</strong><span class="chip">tiny is best</span></div>
+        <div class="row"><input id="quickApp" placeholder="💚 1-line appreciation"/></div>
+        <div class="row"><input id="quickWish" placeholder="🧸 1-line gentle wish"/></div>
+        <div class="row"><button class="btn fill" id="saveQuick">Save</button></div>
+      </div>
+    </section>
 
-        async function getChannelFromGAS() {
-            try {
-                showLoading("Connecting to data source...");
-                console.log('Fetching from GAS:', GAS_URL);
-                
-                const response = await fetch(`${GAS_URL}?action=getChannel&t=${Date.now()}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log('GAS Response:', data);
-                
-                if (data.success) {
-                    return { channel: data.channel, url: data.url };
-                } else {
-                    console.log('GAS returned error:', data.error);
-                    // Still return the fallback data from GAS
-                    return { channel: data.channel, url: data.url };
-                }
-                
-            } catch (error) {
-                console.error('GAS fetch error:', error);
-                showLoading("Connection failed - using default");
-                
-                // Ultimate fallback
-                return { 
-                    channel: 'News', 
-                    url: 'https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/Video-2Mbps.m3u8'
-                };
-            }
-        }
+    <!-- Debates -->
+    <section id="screen-debates" style="display:none">
+      <div class="card">
+        <div class="title"><strong>Today’s Debate</strong><span class="chip">fair & kind</span></div>
+        <div class="row"><input id="debTitle" placeholder="Problem title (short)"/></div>
+        <div class="row"><textarea id="debMine" placeholder="My view (any language)"></textarea></div>
+        <div class="row"><textarea id="debPartner" placeholder="Partner’s view (any language)"></textarea></div>
+        <div class="row">
+          <select id="debLang">
+            <option value="auto">Referee in partner’s language (auto UK/PT/EN)</option>
+            <option value="uk">Ukrainian</option>
+            <option value="pt">Portuguese</option>
+            <option value="en">English</option>
+          </select>
+          <button class="btn" id="refereeBtn">Referee</button>
+        </div>
+        <div id="refereeCard" class="item" style="display:none">
+          <div class="dot" style="background:var(--lilac)"></div>
+          <div style="flex:1">
+            <div id="refereeText"></div>
+            <div class="meta" id="refereeMeta"></div>
+          </div>
+          <button class="btn fill" id="saveDebate">Post</button>
+        </div>
+      </div>
 
-        function playStream(url, channelName) {
-            if (!url || url.trim() === "") {
-                console.error('No URL to play');
-                showLoading("No stream URL available");
-                return;
-            }
+      <div class="card">
+        <div class="title"><strong>Debate Board</strong><span class="chip">vote follow-through</span></div>
+        <div id="debateList"><div class="empty">No debates yet.</div></div>
+      </div>
+    </section>
 
-            showLoading(`Loading ${channelName}...`);
-            showInfo(`Loading ${channelName}`);
-            console.log('Playing:', channelName, url);
+    <!-- Scores -->
+    <section id="screen-scores" style="display:none">
+      <div class="card">
+        <div class="title"><strong>Leaderboard</strong><span class="chip">friendly only 😄</span></div>
+        <div class="item"><div class="dot" style="background:var(--ok)"></div><div style="flex:1"><strong id="meName">You</strong><div class="meta"><span id="meXP">0</span> XP</div></div></div>
+        <div class="item" style="margin-top:8px"><div class="dot" style="background:var(--brand2)"></div><div style="flex:1"><strong id="ptName">Partner</strong><div class="meta"><span id="ptXP">0</span> XP</div></div></div>
+      </div>
 
-            // Clean up previous stream
-            if (hls) {
-                hls.destroy();
-                hls = null;
-            }
+      <div class="card">
+        <div class="title"><strong>Goals</strong><span class="chip">unlock levels</span></div>
+        <div class="item"><div class="dot" style="background:var(--gold)"></div><div>Streak <b id="streakN">0</b> days • Next: keep 3-day streak for <b>Level 2</b></div></div>
+      </div>
+    </section>
+  </main>
 
-            player.pause();
-            player.removeAttribute('src');
-            player.load();
+  <!-- bottom nav -->
+  <nav class="nav">
+    <button class="tab active" data-scr="journey"><div class="ico">🗺️</div>Journey</button>
+    <button class="tab" data-scr="daily"><div class="ico">⭐</div>Daily</button>
+    <button class="tab" data-scr="debates"><div class="ico">⚖️</div>Debates</button>
+    <button class="tab" data-scr="scores"><div class="ico">🏆</div>Scores</button>
+  </nav>
 
-            if (Hls.isSupported()) {
-                hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: false,
-                    backBufferLength: 30,
-                    maxBufferLength: 60,
-                    startLevel: -1
-                });
+  <!-- fab -->
+  <button class="fab" id="fab" aria-label="Add">＋</button>
 
-                hls.loadSource(url);
-                hls.attachMedia(player);
+  <!-- add sheet -->
+  <div class="backdrop" id="sheet">
+    <div class="sheet">
+      <div class="row" style="justify-content:space-between"><strong>Add</strong><button class="btn" id="closeSheet">Close</button></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="addApp">💚 Appreciation</button>
+        <button class="btn" id="addWish">🧸 Wish</button>
+        <button class="btn" id="addDeb">⚖️ Debate</button>
+      </div>
+      <div id="form" style="margin-top:10px"></div>
+      <div class="row" style="margin-top:10px"><button class="btn fill" id="saveBtn" style="display:none">Save</button></div>
+    </div>
+  </div>
 
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    console.log('Stream ready:', channelName);
-                    player.play().then(() => {
-                        hideLoading();
-                        showInfo(`${channelName} - Playing`);
-                        retryCount = 0; // Reset retry count on success
-                        console.log('Playback started:', channelName);
-                    }).catch(err => {
-                        console.error('Autoplay failed:', err);
-                        hideLoading();
-                        showInfo(`${channelName} - Ready (click to play)`);
-                        
-                        // Try autoplay again after a delay
-                        setTimeout(() => {
-                            player.play().catch(() => {
-                                console.log('Second autoplay attempt failed');
-                            });
-                        }, 2000);
-                    });
-                });
+  <div class="toast" id="toast">Saved</div>
 
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS Error:', data.type, data.details);
-                    
-                    if (data.fatal) {
-                        retryCount++;
-                        if (retryCount <= MAX_RETRIES) {
-                            showInfo(`${channelName} - Error, retrying... (${retryCount}/${MAX_RETRIES})`);
-                            console.log(`Retrying stream ${retryCount}/${MAX_RETRIES} in 5 seconds...`);
-                            
-                            setTimeout(() => {
-                                playStream(url, channelName);
-                            }, 5000);
-                        } else {
-                            showInfo(`${channelName} - Stream failed after ${MAX_RETRIES} attempts`);
-                            showLoading("Stream failed - checking for updates...");
-                            retryCount = 0;
-                            
-                            // Try getting a fresh URL after extended delay
-                            setTimeout(updateChannel, 30000);
-                        }
-                    }
-                });
+<script>
+/* ===== simple demo store (no backend) ===== */
+const store = {
+  xp: { me:0, partner:0 }, streak: 0,
+  steps: Array.from({length:8}).map((_,i)=>({lvl:i+1, need: i*20, unlocked: i===0})),
+  feed: [],             // {kind, who, text, when}
+  dailyIndex: 0,
+  debates: []           // {id,title,mine,partner,summary,lang,doneBy:'me'|'partner'|null}
+};
 
-            } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-                // Safari/iOS fallback
-                console.log('Using Safari HLS for:', channelName);
-                player.src = url;
-                
-                player.addEventListener('loadedmetadata', () => {
-                    player.play().then(() => {
-                        hideLoading();
-                        showInfo(`${channelName} - Playing`);
-                        retryCount = 0;
-                    }).catch(err => {
-                        console.error('Safari playback failed:', err);
-                        showInfo(`${channelName} - Playback failed`);
-                    });
-                });
-                
-            } else {
-                console.error('HLS not supported');
-                showLoading("Browser not supported for HLS streaming");
-                showInfo("HLS streaming not supported in this browser");
-            }
-        }
+/* ===== ui helpers ===== */
+const $ = id=>document.getElementById(id);
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(b=>b.addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  const scr=b.dataset.scr;
+  ['journey','daily','debates','scores'].forEach(k=> document.getElementById('screen-'+k).style.display = (k===scr)?'block':'none');
+}));
 
-        async function updateChannel() {
-            try {
-                console.log('Checking for channel updates...');
-                const { channel, url } = await getChannelFromGAS();
-                
-                if (url && url !== currentUrl) {
-                    console.log('Channel update detected:', channel, url);
-                    currentUrl = url;
-                    playStream(url, channel);
-                } else {
-                    console.log('No channel change detected');
-                }
-                
-            } catch (error) {
-                console.error('Update failed:', error);
-                showInfo('Update check failed');
-            }
-        }
+function toast(msg='Saved'){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 
-        // Initialize
-        console.log('IPTV Player starting...');
-        console.log('GAS URL:', GAS_URL);
-        
-        // Check if GAS_URL is configured
-        if (GAS_URL.includes('YOUR_SCRIPT_ID')) {
-            showLoading('Please configure GAS_URL in the code');
-            showInfo('Configuration needed: Replace YOUR_SCRIPT_ID with actual Google Apps Script URL');
-            return;
-        }
-        
-        // Start the player
-        updateChannel();
-        
-        // Check for updates every 5 seconds
-        setInterval(updateChannel, 5000);
-        
-        // Health check every 30 seconds
-        setInterval(() => {
-            if (player.readyState === 0 && currentUrl) {
-                console.log('Health check failed, restarting...');
-                showInfo('Connection lost - restarting...');
-                const currentChannel = info.textContent?.split(' - ')[0] || 'Stream';
-                playStream(currentUrl, currentChannel);
-            }
-        }, 30000);
+function addXP(who, amount){
+  store.xp[who]+=amount;
+  $('meXP').textContent = store.xp.me;
+  $('ptXP').textContent = store.xp.partner;
+  const total = store.xp.me + store.xp.partner;
+  const lvl = store.steps.findLast(s=> total >= s.need) || store.steps[0];
+  store.steps.forEach(s=> s.unlocked = total >= s.need);
+  renderJourney();
+  renderBadges();
+}
 
-        // Video event listeners
-        player.addEventListener('error', (e) => {
-            console.error('Video error:', e);
-            showInfo('Video error - restarting...');
-            setTimeout(() => {
-                if (currentUrl) {
-                    const currentChannel = info.textContent?.split(' - ')[0] || 'Stream';
-                    playStream(currentUrl, currentChannel);
-                }
-            }, 3000);
-        });
+function renderJourney(){
+  const strip=$('journeyStrip'); strip.innerHTML='';
+  store.steps.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='step'+(s.unlocked?'':' locked');
+    div.innerHTML=`<div class="lvl">Level ${s.lvl}</div><div class="xp">${s.need} XP</div>`;
+    strip.appendChild(div);
+  });
+}
 
-        // Manual play on click
-        player.addEventListener('click', () => {
-            if (player.paused && currentUrl) {
-                player.play().catch(err => {
-                    console.error('Manual play failed:', err);
-                });
-            }
-        });
-    </script>
+function renderBadges(){
+  $('xpBadge').textContent = `XP ${store.xp.me + store.xp.partner} • Streak ${store.streak}🔥`;
+}
+
+function addFeed(kind, who, text){
+  store.feed.unshift({kind, who, text, when: new Date()});
+  renderFeed();
+}
+
+function renderFeed(){
+  const feed=$('feed');
+  if(!store.feed.length){ feed.innerHTML='<div class="empty">No activity yet. Tap <b>＋</b> to start a challenge.</div>'; return; }
+  feed.innerHTML='';
+  store.feed.forEach(it=>{
+    const li=document.createElement('div');
+    li.className='item type-'+(it.kind==='appreciation'?'app':'wish');
+    if(it.kind==='summary' || it.kind==='debate') li.className='item type-debate';
+    const when = new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(it.when);
+    li.innerHTML=`<div class="dot"></div><div style="flex:1"><div>${it.text}</div><div class="meta">— ${it.who} • ${when}</div></div>`;
+    feed.appendChild(li);
+  });
+}
+
+/* ===== daily challenge ===== */
+const DAILIES = [
+  "Send 1 concrete appreciation.",
+  "Plan a 10-minute walk together.",
+  "Use “I feel… when…, I’d love if…” once today.",
+  "Do a 5-minute tidy together.",
+  "Share 1 small win from the day.",
+  "Make tomorrow’s mini-plan (2 bullets).",
+];
+function renderDaily(){
+  const i = store.dailyIndex % DAILIES.length;
+  $('dailyText').textContent = DAILIES[i];
+  $('dailyChip').textContent = `Challenge ${i+1}/${DAILIES.length}`;
+  $('dailyMeta').textContent = 'Complete for +2 XP each';
+}
+$('completeDaily').addEventListener('click', ()=>{
+  addXP('me',2); addXP('partner',2);
+  store.streak += 1;
+  addFeed('daily','Both', 'Completed daily challenge');
+  store.dailyIndex++;
+  renderDaily(); renderBadges(); toast('Daily complete +4 XP');
+});
+$('saveQuick').addEventListener('click', ()=>{
+  const a=$('quickApp').value.trim(), w=$('quickWish').value.trim();
+  if(a){ addFeed('appreciation','Me', a); addXP('me',1); $('quickApp').value=''; }
+  if(w){ addFeed('wish','Me', w); addXP('me',2); $('quickWish').value=''; }
+  toast('Saved');
+});
+
+/* ===== debates (referee) ===== */
+function guessLang(t){
+  if(/[\u0400-\u04FF]/.test(t)) return 'uk';
+  const pt=[' que ',' não ',' você ',' pra ',' de ',' é ',' ao ',' à ',' meu ',' minha ',' seu ',' sua ',' com '];
+  const L=' '+t.toLowerCase()+' '; return pt.some(w=>L.includes(w))?'pt':'en';
+}
+function summarizeLocal(title, mine, partner, target){
+  // Tiny, kind, neutral referee (2–3 lines)
+  const templates={
+    en: (t,m,p)=>`Referee (${t}): You both care. You said: “${m.slice(0,80)}…”. Partner said: “${p.slice(0,80)}…”. Tiny next step: pick one test for 48h and check in.`,
+    pt: (t,m,p)=>`Árbitro (${t}): Vocês se importam. Você: “${m.slice(0,80)}…”. Parceira(o): “${p.slice(0,80)}…”. Passo pequeno: 1 teste por 48h e revisar.`,
+    uk: (t,m,p)=>`Рефері (${t}): Вам обом не байдуже. Ви: «${m.slice(0,80)}…». Партнер(ка): «${p.slice(0,80)}…». Малий крок: 1 тест на 48 год і перевірка.`
+  };
+  return (templates[target]||templates.en)(title,mine,partner);
+}
+$('refereeBtn').addEventListener('click', ()=>{
+  const title=$('debTitle').value.trim();
+  const mine=$('debMine').value.trim();
+  const partner=$('debPartner').value.trim();
+  if(!title||!mine||!partner) return;
+  const target = (()=>{
+    const sel = $('debLang').value;
+    if(sel!=='auto') return sel;
+    // pick partner language from their text if present, else default uk
+    const gl = guessLang(partner); return gl || 'uk';
+  })();
+  const out = summarizeLocal(title, mine, partner, target);
+  $('refereeText').textContent = out;
+  $('refereeMeta').textContent = `→ ${target.toUpperCase()} • fair & short`;
+  $('refereeCard').style.display='flex';
+});
+$('saveDebate').addEventListener('click', ()=>{
+  const title=$('debTitle').value.trim();
+  const sum=$('refereeText').textContent.trim();
+  if(!title||!sum) return;
+  const id = Math.random().toString(36).slice(2,9);
+  store.debates.unshift({id,title,summary:sum,doneBy:null});
+  renderDebates();
+  addFeed('debate','Referee',`“${title}” → plan posted`);
+  toast('Debate posted (+1 XP each)'); addXP('me',1); addXP('partner',1);
+  // reset form
+  $('debTitle').value=''; $('debMine').value=''; $('debPartner').value=''; $('refereeCard').style.display='none';
+});
+function renderDebates(){
+  const list=$('debateList'); if(!store.debates.length){ list.innerHTML='<div class="empty">No debates yet.</div>'; return; }
+  list.innerHTML='';
+  store.debates.forEach(d=>{
+    const row=document.createElement('div'); row.className='item';
+    row.innerHTML=`<div class="dot" style="background:${'#c7b4ff'}"></div>
+      <div style="flex:1">
+        <div><strong>${d.title}</strong></div>
+        <div class="meta">${d.summary}</div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" data-who="me">✔️ I followed</button>
+          <button class="btn" data-who="partner">✔️ Partner followed</button>
+          <button class="btn" data-who="none">✖️ Skip</button>
+        </div>
+      </div>`;
+    const btns = row.querySelectorAll('button');
+    btns.forEach(b=> b.addEventListener('click', ()=>{
+      const who=b.dataset.who;
+      if(who==='me'){ addXP('me',3); addFeed('summary','Me',`Followed debate: ${d.title}`); }
+      else if(who==='partner'){ addXP('partner',3); addFeed('summary','Partner',`Followed debate: ${d.title}`); }
+      list.removeChild(row);
+    }));
+    list.appendChild(row);
+  });
+}
+
+/* ===== add sheet ===== */
+const sheet=$('sheet'), form=$('form');
+$('fab').addEventListener('click', ()=>{ sheet.classList.add('show'); form.innerHTML=''; $('saveBtn').style.display='none'; });
+$('closeSheet').addEventListener('click', ()=> sheet.classList.remove('show'));
+$('addApp').addEventListener('click', ()=>{
+  form.innerHTML = `<textarea id="t" placeholder="💚 1-2 sentences…"></textarea>`; $('saveBtn').style.display='inline-block';
+  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('appreciation','Me',v); addXP('me',1); sheet.classList.remove('show'); toast('Added'); };
+});
+$('addWish').addEventListener('click', ()=>{
+  form.innerHTML = `<textarea id="t" placeholder="🧸 I feel… when…, I’d love if…"></textarea>`; $('saveBtn').style.display='inline-block';
+  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('wish','Me',v); addXP('me',2); sheet.classList.remove('show'); toast('Added'); };
+});
+$('addDeb').addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active')); document.querySelector('[data-scr="debates"]').classList.add('active');
+  ['journey','daily','scores'].forEach(k=> document.getElementById('screen-'+k).style.display='none');
+  document.getElementById('screen-debates').style.display='block';
+  sheet.classList.remove('show');
+});
+
+/* ===== settings (names only for demo) ===== */
+$('settingsBtn').addEventListener('click', ()=>{
+  const newMe = prompt('Your display name', $('meName').textContent || 'You') || 'You';
+  const newPt = prompt('Partner display name', $('ptName').textContent || 'Partner') || 'Partner';
+  $('meName').textContent = newMe; $('ptName').textContent = newPt;
+  toast('Names saved');
+});
+
+/* ===== start ===== */
+renderJourney(); renderBadges(); renderFeed(); renderDaily(); renderDebates();
+</script>
 </body>
 </html>
