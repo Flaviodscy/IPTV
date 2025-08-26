@@ -1,487 +1,491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Us — Journey (Playful)</title>
-<meta name="theme-color" content="#ffffff" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+<title>HARMONY — duel but cute</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#101214"/>
 <style>
   :root{
-    /* palette — soft, playful */
-    --bg:#f9fafc; --card:#ffffff; --ink:#141a2e; --muted:#7a849d; --line:#e8edf6;
-    --mint:#72e4c1; --sky:#9fc2ff; --lilac:#c9b5ff; --coral:#ffb8a8; --lemon:#f9df7a;
-    --green:#41d39a; --pink:#ff9bb0; --blue:#6aa7ff; --gold:#f7c84a;
-    --r:18px; --shadow:0 10px 28px rgba(0,0,0,.08); --bar:64px; --fab:66px;
+    /* palette: modern, punchy but elegant */
+    --bg:#0e1117; --ink:#eaf1ff; --muted:#9fb0c8; --line:#1e2635;
+    --g1:#7be7c3; --g2:#9db3ff; --g3:#ffc3a1; --g4:#b8a7ff;
+    --good:#76f2ba; --warn:#ffd48f; --bad:#ff9aa7;
+    --glass: rgba(255,255,255,.06);
+    --r:18px; --shadow:0 18px 40px rgba(0,0,0,.45);
+    --bar:66px; --tap:52px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{
-    margin:0; color:var(--ink); background:
-      radial-gradient(900px 600px at -10% -10%, #f2f6ff 0%, transparent 60%),
-      radial-gradient(1000px 700px at 120% -20%, #f3fff7 0%, transparent 60%),
-      var(--bg);
-    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    margin:0; color:var(--ink); background:radial-gradient(1400px 900px at -10% -20%, #182039 0%, transparent 60%), radial-gradient(1200px 800px at 110% -10%, #10271f 0%, transparent 60%), #0e1117;
+    font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background-attachment: fixed;
   }
+
+  /* animated blobs (hero) */
+  .blobs::before,.blobs::after{
+    content:""; position:fixed; inset:auto; width:520px; height:520px; border-radius:50%;
+    filter: blur(60px); z-index:-1; opacity:.55; animation: float 14s ease-in-out infinite;
+  }
+  .blobs::before{ right:-140px; top:-140px; background: radial-gradient(closest-side, #1f2b5e, transparent); }
+  .blobs::after{ left:-160px; bottom:-160px; background: radial-gradient(closest-side, #1e3d2e, transparent); animation-delay: -6s; }
+  @keyframes float{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-22px)} }
 
   /* top bar */
-  .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px;
-    padding:12px 14px;background:linear-gradient(180deg,#fff,#ffffffdd);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-  .brand{display:flex;gap:10px;align-items:center}
-  .logo{width:36px;height:36px;border-radius:12px;background:conic-gradient(from 0deg, var(--mint), var(--sky), var(--lilac), var(--coral), var(--mint))}
-  h1{margin:0;font-size:18px}
-  .muted{color:var(--muted);font-size:12px}
-  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 14px;font-weight:800}
-  .btn.ghost{background:#fff}
-  .chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;background:#fff}
-
-  /* layout */
-  .wrap{padding:12px 12px calc(var(--bar)+24px)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
-  .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:16px;outline:none}
-  textarea{min-height:88px;resize:vertical}
-  .empty{color:#8ea0bd;text-align:center;padding:16px}
-
-  /* Journey path */
-  .journey-wrap{position:relative; height:300px; overflow:hidden; border-radius:16px; background:linear-gradient(180deg,#ffffff,#fcfdff)}
-  .journey-bg{position:absolute; inset:0; background:
-      radial-gradient(60px 60px at 10% 20%, #fff6 0, transparent 60%),
-      radial-gradient(80px 80px at 80% 10%, #fff6 0, transparent 60%),
-      radial-gradient(80px 80px at 20% 90%, #fff6 0, transparent 60%);
-    pointer-events:none}
-  svg#line{position:absolute; inset:0}
-  .node{
-    position:absolute; width:54px; height:54px; border-radius:50%;
-    background:#fff; border:2px solid var(--line); display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 14px rgba(0,0,0,.06);
-    transition: transform .2s ease, border-color .2s ease;
+  header{
+    position:sticky; top:0; z-index:15; padding:12px 14px; backdrop-filter: blur(8px) saturate(1.2);
+    background:linear-gradient(180deg, rgba(10,13,20,.85), rgba(10,13,20,.35)); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
-  .node.unlocked{border-color:#cfe7ff}
-  .node .dot{width:14px;height:14px;border-radius:50%; background:#d0d7eb}
-  .node.unlocked .dot{background:linear-gradient(135deg,var(--mint),var(--sky))}
-  .node.current{transform:scale(1.06)}
-  .node.done .dot{background:linear-gradient(135deg,var(--green),#a8ffd7)}
-  .node .lvl{position:absolute; top:-22px; font-size:12px; color:#6a7696; font-weight:800}
-  .node .badge{position:absolute; bottom:-22px; font-size:12px; color:#1b6f4a; font-weight:900}
-
-  /* feed items */
-  .item{display:flex;gap:10px;padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line)}
-  .dot{width:12px;height:12px;border-radius:50%}
-  .type-app .dot{background:var(--green)}
-  .type-wish .dot{background:var(--coral)}
-  .type-sum .dot{background:var(--lilac)}
-  .meta{color:#7b88a6;font-size:12px;margin-top:6px}
-  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;background:#fff}
-
-  /* micro quests */
-  .quest{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
-  .quest .tick{width:24px;height:24px;border-radius:50%;border:2px solid #cfe0ff;display:grid;place-items:center;cursor:pointer}
-  .quest.done{opacity:.6}
-  .quest.done .tick{background:linear-gradient(135deg,var(--mint),var(--sky)); color:#063; border-color:transparent}
-
-  /* avatars/badges */
-  .avatars{display:flex; gap:10px; align-items:center}
-  .ava{width:36px;height:36px;border-radius:50%; background:#fff; border:2px solid var(--line); display:grid; place-items:center; font-size:18px}
-  .badges{display:flex; gap:8px; flex-wrap:wrap}
-  .badgeIcon{font-size:18px; display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%;
-    background:#fff; border:1px solid var(--line)}
+  .brand{display:flex; align-items:center; gap:10px}
+  .sig{
+    width:36px;height:36px;border-radius:12px;
+    background: conic-gradient(from 0deg, var(--g1), var(--g2), var(--g3), var(--g1));
+    box-shadow:0 0 0 1px #24304a inset, 0 8px 22px rgba(0,0,0,.4);
+  }
+  .h1{font-family:Fraunces, serif; font-weight:700; letter-spacing:.2px; margin:0; font-size:18px}
+  .sub{color:var(--muted); font-size:12px}
+  .btn{
+    appearance:none; border:1px solid var(--line); background:#0d1220; color:#eaf1ff; border-radius:12px; padding:10px 12px; font-weight:700; cursor:pointer;
+  }
+  .btn.ghost{background:transparent}
+  .btn.primary{background:linear-gradient(135deg, #1b283f, #1f2a54);}
 
   /* bottom nav */
-  .nav{position:fixed;bottom:0;inset-inline:0;height:var(--bar);display:flex;justify-content:space-around;align-items:center;
-    background:#fff;border-top:1px solid var(--line);z-index:20}
-  .tab{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#6a7696;font-size:11px}
-  .tab.active{color:#1a1d2b;font-weight:800}
-  .ico{font-size:20px;line-height:1}
+  nav{
+    position:fixed; bottom:0; inset-inline:0; height:var(--bar); display:flex; justify-content:space-around; align-items:center;
+    background:rgba(10,13,20,.8); border-top:1px solid var(--line); backdrop-filter: blur(8px); z-index:20;
+  }
+  .tab{flex:1; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#aabdff; font-size:11px; font-weight:700}
+  .tab.active{color:#fff}
+  .ico{font-size:19px; line-height:1}
 
-  /* fab */
-  .fab{position:fixed;right:16px;bottom:calc(var(--bar)+16px);width:var(--fab);height:var(--fab);border-radius:50%;
-    background:conic-gradient(from 0deg,var(--mint),var(--sky),var(--lilac));color:#042;border:none;font-size:30px;font-weight:900;box-shadow:0 14px 32px rgba(0,0,0,.18)}
+  /* layout */
+  .wrap{max-width:940px; margin:0 auto; padding:16px 14px calc(var(--bar) + 20px)}
+  .grid{display:grid; gap:14px}
+  @media(min-width:900px){ .grid.cols2{grid-template-columns:1fr 1fr} }
+
+  /* glass cards */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:14px;
+  }
+  .title{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+  .pill{display:inline-flex; align-items:center; gap:6px; border:1px solid #2b3650; background:#0d1324; color:#d7e1ff; padding:6px 10px; border-radius:999px; font-size:12px}
+
+  input,textarea,select{
+    width:100%; background:#0c1426; color:#eaf1ff; border:1px solid var(--line); border-radius:12px; padding:12px; font-size:16px; outline:none;
+  }
+  textarea{min-height:90px; resize:vertical}
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .muted{color:var(--muted)}
+
+  /* Harmony Orb */
+  .orb{
+    position:relative; width:220px; height:220px; border-radius:50%;
+    background: radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,.12), rgba(255,255,255,.02));
+    border:1px solid #223050; margin:0 auto; display:grid; place-items:center;
+    box-shadow: inset 0 0 40px rgba(124,202,255,.05), 0 20px 60px rgba(0,0,0,.35);
+  }
+  .orb::after{
+    content:""; position:absolute; inset:8px; border-radius:50%;
+    background: conic-gradient(from 270deg, var(--g1) 0 var(--p), rgba(255,255,255,.05) var(--p) 100%);
+    mask: radial-gradient(closest-side, transparent 74%, black 75%);
+    transition: .4s ease all;
+  }
+  .orb-label{
+    text-align:center;
+  }
+  .orb .big{font-family:Fraunces,serif; font-size:30px; letter-spacing:.3px}
+  .orb .small{color:#b6c5e6; font-size:12px}
+
+  /* mini modes */
+  .modes{display:grid; gap:10px}
+  .mode{
+    display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.03)
+  }
+  .mode .icon{font-size:22px}
+  .mode strong{letter-spacing:.2px}
+
+  /* duel */
+  .duel{display:grid; gap:10px}
+  .half{display:grid; gap:8px}
+  .timer{font-variant-numeric: tabular-nums; font-weight:800; letter-spacing:.6px; padding:8px 10px; border-radius:10px; border:1px solid var(--line); width:fit-content}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{border:1px solid #2b3855; background:#101a30; color:#d7e5ff; padding:6px 10px; border-radius:999px; font-size:12px}
+
+  /* plan quest checklist */
+  .check{display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--line); border-radius:12px; background:#0d1425}
+  .tick{width:24px; height:24px; border-radius:50%; border:2px solid #3a4a71; display:grid; place-items:center; cursor:pointer}
+  .done .tick{background:linear-gradient(135deg, var(--g1), var(--g2)); border-color:transparent; color:#08220f}
+  .done{opacity:.9}
+
+  /* memory vine */
+  .vine{
+    position:relative; height:380px; overflow:hidden; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px solid var(--line);
+  }
+  .vine svg{position:absolute; inset:0}
+  .leaf{
+    position:absolute; width:72px; height:72px; border-radius:50%;
+    box-shadow:0 6px 20px rgba(0,0,0,.35); overflow:hidden; border:2px solid #2a374f; background:#0b1324; display:grid; place-items:center
+  }
+  .leaf img{width:100%; height:100%; object-fit:cover}
+  .leaf .cap{position:absolute; bottom:-2px; left:0; right:0; text-align:center; font-size:11px; color:#cfe2ff; background:linear-gradient(180deg, transparent, rgba(0,0,0,.6))}
+  .empty{color:#9ab0d6; text-align:center; padding:12px}
+
+  /* floating + */
+  .fab{
+    position:fixed; right:16px; bottom:calc(var(--bar) + 16px); width:58px;height:58px;border-radius:50%;
+    border:0; cursor:pointer; color:#04101a; font-size:28px; font-weight:900;
+    background:conic-gradient(from 0deg, var(--g1), var(--g2), var(--g4));
+    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+  }
 
   /* sheet */
-  .backdrop{position:fixed;inset:0;display:none;background:rgba(0,0,0,.18);backdrop-filter:blur(6px);align-items:flex-end;z-index:30}
-  .sheet{width:100%;border-top-left-radius:18px;border-top-right-radius:18px;background:#fff;border-top:1px solid var(--line);padding:14px 12px 18px}
+  .backdrop{position:fixed; inset:0; display:none; background:rgba(6,8,12,.65); backdrop-filter: blur(8px); align-items:flex-end; z-index:50}
+  .sheet{width:100%; background:#0c1220; border-top:1px solid var(--line); border-top-left-radius:18px; border-top-right-radius:18px; padding:14px 12px 18px}
   .show{display:flex}
 
-  /* toast */
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar)+var(--fab)+12px);background:#fff;border:1px solid var(--line);
-    color:#173; padding:10px 14px;border-radius:999px;display:none;z-index:40;box-shadow:var(--shadow)}
-  .toast.show{display:block}
-
-  /* fun animations */
-  @keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  /* micro anim */
+  @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
   .pop{animation:pop .25s ease}
 </style>
 </head>
-<body>
-  <!-- Top -->
-  <div class="top">
+<body class="blobs">
+  <header>
     <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
+      <div class="sig" aria-hidden="true"></div>
       <div>
-        <h1>Us — Journey</h1>
-        <div class="muted">Playful • light mode</div>
+        <p class="h1">HARMONY</p>
+        <div class="sub">duel • listen • plan — together</div>
       </div>
     </div>
-    <div class="row avatars">
-      <div class="ava" id="meAva">🦊</div>
-      <div class="ava" id="ptAva">🐣</div>
-      <button class="btn" id="editNames">✏️</button>
-    </div>
-  </div>
+    <button class="btn ghost" id="styleBtn">Style</button>
+  </header>
 
   <main class="wrap">
-    <!-- Journey Map -->
-    <section id="screen-journey">
-      <div class="card">
-        <div class="title">
-          <strong>Journey</strong>
-          <span class="pill" id="xpBadge">XP 0 • Streak 0🔥</span>
+    <!-- Dashboard -->
+    <section id="home">
+      <div class="grid cols2">
+        <div class="card">
+          <div class="title"><strong>Harmony</strong><span class="pill" id="xpPill">0 / 100</span></div>
+          <div class="orb" id="orb" style="--p:0%">
+            <div class="orb-label">
+              <div class="big" id="orbBig">0%</div>
+              <div class="small">fair rounds this week</div>
+            </div>
+          </div>
+          <div class="modes" style="margin-top:12px">
+            <div class="mode"><div class="icon">🎧</div><div style="flex:1"><strong>Listen Duel</strong><div class="sub">90s each • 3 words the listener heard</div></div><button class="btn" data-go="listen">Play</button></div>
+            <div class="mode"><div class="icon">⚖️</div><div style="flex:1"><strong>Debate Lab</strong><div class="sub">3 lines each → tiny neutral plan</div></div><button class="btn" data-go="debate">Play</button></div>
+            <div class="mode"><div class="icon">🗺️</div><div style="flex:1"><strong>Plan Quest</strong><div class="sub">micro-plan for the weekend (dog-friendly!)</div></div><button class="btn" data-go="plan">Play</button></div>
+          </div>
         </div>
-        <div class="journey-wrap">
-          <svg id="line" viewBox="0 0 400 300" preserveAspectRatio="none">
-            <!-- playful squiggle path -->
-            <path id="path" d="M20,270 C60,210 90,210 120,260 C150,310 210,310 240,250 C270,195 300,190 340,230"
-                  fill="none" stroke="url(#grad)" stroke-width="10" stroke-linecap="round" stroke-opacity="0.3"/>
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#72e4c1"/><stop offset="100%" stop-color="#9fc2ff"/>
-              </linearGradient>
-            </defs>
+
+        <div class="card">
+          <div class="title"><strong>Today</strong><span class="pill">keep it tiny</span></div>
+          <div class="row"><input id="appreciation" placeholder="💚 One thing I appreciated…"/></div>
+          <div class="row"><input id="wish" placeholder="🧸 I feel… when… I’d love if…"/></div>
+          <div class="row"><button class="btn primary" id="addToday">Add to feed</button></div>
+          <div id="feed" style="margin-top:10px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title"><strong>Memory Vine</strong><span class="pill">weekend/month highlights</span></div>
+        <div class="vine" id="vine">
+          <svg viewBox="0 0 800 380" preserveAspectRatio="none">
+            <path id="stem" d="M40,360 C160,300 260,300 360,340 C460,380 560,350 660,290 C760,230 760,150 670,110 C580,70 470,90 380,130 C290,170 190,190 120,160 C60,135 45,95 80,60" stroke="url(#sg)" stroke-width="6" fill="none" stroke-linecap="round" stroke-opacity=".55"/>
+            <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7be7c3"/><stop offset="100%" stop-color="#9db3ff"/></linearGradient></defs>
           </svg>
-          <div class="journey-bg"></div>
-          <!-- nodes are positioned by JS -->
-          <div id="nodes"></div>
+          <div id="leaves"></div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="title">
-          <strong>Micro-quests (today)</strong>
-          <span class="chip">finish all = +4 XP</span>
-        </div>
-        <div class="row" id="quests"></div>
-      </div>
-
-      <div class="card">
-        <div class="title"><strong>Activity</strong><span class="chip">💚 +1 • 🧸 +2 • ⚖️ +3</span></div>
-        <div id="feed"><div class="empty">No activity yet. Tap <b>＋</b> to add.</div></div>
-      </div>
-
-      <div class="card">
-        <div class="title"><strong>Badges</strong><span class="chip">collect & flex</span></div>
-        <div class="badges" id="badges">
-          <div class="badgeIcon" title="First step">🥇</div>
-          <div class="badgeIcon" title="3-day streak">🔥</div>
-          <div class="badgeIcon" title="7 appreciations">💚</div>
-          <div class="badgeIcon" title="Calm debate">🫖</div>
+        <div class="row" style="margin-top:10px">
+          <input id="memUrl" placeholder="Image URL"/>
+          <input id="memCap" placeholder="Caption (e.g., Dog park + new camera)"/>
+          <button class="btn" id="addLeaf">Add leaf</button>
         </div>
       </div>
     </section>
 
-    <!-- Debates -->
-    <section id="screen-debates" style="display:none">
+    <!-- Listen Duel -->
+    <section id="listen" style="display:none">
       <div class="card">
-        <div class="title"><strong>Debate Arena</strong><span class="chip">fair & kind</span></div>
-        <div class="row"><input id="debTitle" placeholder="Problem title (short)"/></div>
-        <div class="row"><textarea id="debMine" placeholder="My view (any language)"></textarea></div>
-        <div class="row"><textarea id="debPartner" placeholder="Partner’s view (any language)"></textarea></div>
+        <div class="title"><strong>🎧 Listen Duel</strong><span class="pill">90s each • then 3 words</span></div>
+        <div class="duel">
+          <div class="half">
+            <div class="sub">You speak</div>
+            <textarea id="l_me" placeholder="Say your side (any language)"></textarea>
+            <div class="row"><span class="timer" id="l_timer">01:30</span><button class="btn" id="l_start">Start</button></div>
+          </div>
+          <div class="half">
+            <div class="sub">Partner summarizes (3 words)</div>
+            <div class="chips" id="l_words"></div>
+            <div class="row"><input id="l_word" placeholder="type a word…"/><button class="btn" id="l_add">Add</button></div>
+          </div>
+          <div class="row"><button class="btn primary" id="l_finish">Finish round</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Debate Lab -->
+    <section id="debate" style="display:none">
+      <div class="card">
+        <div class="title"><strong>⚖️ Debate Lab</strong><span class="pill">3 lines each → tiny plan</span></div>
+        <div class="row"><input id="d_title" placeholder="Topic (e.g., chores, timing, tone)"/></div>
+        <div class="row"><textarea id="d_me" maxlength="180" placeholder="My view (≤ 3 lines)"></textarea></div>
+        <div class="row"><textarea id="d_pt" maxlength="180" placeholder="Partner’s view (≤ 3 lines)"></textarea></div>
         <div class="row">
-          <select id="debLang">
+          <select id="d_lang">
             <option value="auto">Referee in partner’s language (auto UK/PT/EN)</option>
             <option value="uk">Ukrainian</option>
             <option value="pt">Portuguese</option>
             <option value="en">English</option>
           </select>
-          <button class="btn" id="refereeBtn">Referee</button>
+          <button class="btn" id="d_ref">Referee</button>
         </div>
-        <div id="refereeCard" class="item" style="display:none">
-          <div class="dot" style="background:var(--lilac)"></div>
-          <div style="flex:1">
-            <div id="refereeText"></div>
-            <div class="meta" id="refereeMeta"></div>
-          </div>
-          <button class="btn" id="saveDebate" style="background:linear-gradient(135deg,var(--mint),var(--sky));color:#063">Post</button>
+        <div id="d_card" class="card" style="display:none; margin-top:10px">
+          <div class="title"><strong>Referee</strong><span class="pill">neutral & short</span></div>
+          <div id="d_out"></div>
+          <div class="sub" id="d_meta" style="margin-top:6px"></div>
+          <div class="row" style="margin-top:10px"><button class="btn primary" id="d_post">Post to feed</button></div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="title"><strong>Debate Board</strong><span class="chip">vote follow-through</span></div>
-        <div id="debateList"><div class="empty">No debates yet.</div></div>
       </div>
     </section>
 
-    <!-- Scores -->
-    <section id="screen-scores" style="display:none">
+    <!-- Plan Quest -->
+    <section id="plan" style="display:none">
       <div class="card">
-        <div class="title"><strong>Leaderboard</strong><span class="chip">friendly only 😄</span></div>
-        <div class="item"><div class="dot" style="background:var(--green)"></div><div style="flex:1"><strong id="meName">You</strong><div class="meta"><span id="meXP">0</span> XP</div></div></div>
-        <div class="item" style="margin-top:8px"><div class="dot" style="background:var(--sky)"></div><div style="flex:1"><strong id="ptName">Partner</strong><div class="meta"><span id="ptXP">0</span> XP</div></div></div>
-      </div>
-      <div class="card">
-        <div class="title"><strong>Streak & Goals</strong><span class="chip">unlock levels</span></div>
-        <div class="item"><div class="dot" style="background:var(--gold)"></div><div>Streak <b id="streakN">0</b> days • Next: keep a 3-day streak for <b>Level 2</b></div></div>
+        <div class="title"><strong>🗺️ Plan Quest</strong><span class="pill">micro-plan, dog-friendly</span></div>
+        <div class="row"><input id="p_theme" placeholder="Theme (e.g., photo walk, coffee hunt, river sunset)" /></div>
+        <div id="p_list" class="grid"></div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" id="p_make">Generate steps</button></div>
       </div>
     </section>
   </main>
 
   <!-- bottom nav -->
-  <nav class="nav">
-    <button class="tab active" data-scr="journey"><div class="ico">🗺️</div>Journey</button>
-    <button class="tab" data-scr="debates"><div class="ico">⚖️</div>Debates</button>
-    <button class="tab" data-scr="scores"><div class="ico">🏆</div>Scores</button>
+  <nav>
+    <button class="tab active" data-scr="home"><div class="ico">🏠</div>Home</button>
+    <button class="tab" data-scr="listen"><div class="ico">🎧</div>Listen</button>
+    <button class="tab" data-scr="debate"><div class="ico">⚖️</div>Debate</button>
+    <button class="tab" data-scr="plan"><div class="ico">🗺️</div>Plan</button>
   </nav>
 
-  <!-- fab -->
-  <button class="fab" id="fab" aria-label="Add">＋</button>
+  <!-- floating + (quick add to feed) -->
+  <button class="fab" id="fab" title="Add">＋</button>
 
-  <!-- add sheet -->
+  <!-- sheet -->
   <div class="backdrop" id="sheet">
     <div class="sheet">
-      <div class="row" style="justify-content:space-between"><strong>Add</strong><button class="btn" id="closeSheet">Close</button></div>
+      <div class="row" style="justify-content:space-between"><strong>Add to feed</strong><button class="btn" id="closeSheet">Close</button></div>
       <div class="row" style="margin-top:10px">
-        <button class="btn" id="addApp">💚 Appreciation</button>
-        <button class="btn" id="addWish">🧸 Wish</button>
-        <button class="btn" id="addDeb">⚖️ Debate</button>
+        <button class="btn" id="quickApp">💚 Appreciation</button>
+        <button class="btn" id="quickWish">🧸 Wish</button>
+        <button class="btn" id="quickNote">📝 Note</button>
       </div>
-      <div id="form" style="margin-top:10px"></div>
-      <div class="row" style="margin-top:10px"><button class="btn" id="saveBtn" style="display:none;background:linear-gradient(135deg,var(--mint),var(--sky));color:#063">Save</button></div>
+      <div id="sheetForm" style="margin-top:10px"></div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="sheetSave" style="display:none">Save</button></div>
     </div>
   </div>
 
-  <div class="toast" id="toast">Saved</div>
-
-  <!-- confetti canvas -->
-  <canvas id="fx" style="position:fixed;inset:0;pointer-events:none;z-index:50"></canvas>
-
 <script>
-/* ===== tiny store (demo) ===== */
-const store = {
-  xp: { me:0, partner:0 }, streak:0,
-  steps: 10,
+/* === state === */
+const state = {
+  harmony: 0, // 0..100
   feed: [],
-  debates: [],
-  quests: [
-    {id:'q1', text:'Send 1 concrete appreciation', done:false},
-    {id:'q2', text:'Plan a 10-min walk', done:false},
-    {id:'q3', text:'Use “I feel… when… I’d love if…” once', done:false},
-  ]
+  leaves: []
 };
 
-/* ===== helpers ===== */
-const $ = id=>document.getElementById(id);
-const toast = (m='Saved')=>{ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); };
-function timeStr(d){ return new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(d); }
+const $ = id => document.getElementById(id);
 
-/* ===== confetti (cute + tiny) ===== */
-const ctx = $('fx').getContext('2d');
-function resizeFx(){ $('fx').width=innerWidth; $('fx').height=innerHeight }
-addEventListener('resize', resizeFx); resizeFx();
-let confs=[];
-function confetti(x=innerWidth/2,y=innerHeight/2,count=80){
-  for(let i=0;i<count;i++){
-    confs.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()*-4-2), g:0.12, s:Math.random()*4+2, c:`hsl(${Math.random()*360},80%,60%)`, life:Math.random()*60+30});
-  }
-}
-function loop(){
-  ctx.clearRect(0,0,innerWidth,innerHeight);
-  confs = confs.filter(p=>p.life>0);
-  confs.forEach(p=>{
-    p.life--; p.x+=p.vx; p.y+=p.vy; p.vy+=p.g;
-    ctx.fillStyle=p.c; ctx.fillRect(p.x, p.y, p.s, p.s);
+/* === nav === */
+document.querySelectorAll('nav .tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav .tab').forEach(x=>x.classList.remove('active')); btn.classList.add('active');
+    const scr = btn.dataset.scr;
+    ['home','listen','debate','plan'].forEach(k=> document.getElementById(k).style.display = (k===scr)?'block':'none');
+    scrollTo(0,0);
   });
-  requestAnimationFrame(loop);
+});
+document.querySelectorAll('[data-go]').forEach(b=> b.onclick=()=> {
+  const scr = b.dataset.go;
+  document.querySelector(`nav .tab[data-scr="${scr}"]`).click();
+});
+
+/* === Harmony Orb === */
+function setHarmony(v){
+  state.harmony = Math.max(0, Math.min(100, v));
+  const orb = $('orb');
+  orb.style.setProperty('--p', state.harmony+'%');
+  $('orbBig').textContent = Math.round(state.harmony)+'%';
+  $('xpPill').textContent = `${Math.round(state.harmony)} / 100`;
 }
-loop();
+setHarmony(0);
 
-/* ===== journey path nodes ===== */
-function placeNodes(){
-  const svg = document.getElementById('line');
-  const path = document.getElementById('path');
-  const nodesHost = document.getElementById('nodes');
-  nodesHost.innerHTML='';
-
-  const len = path.getTotalLength();
-  const steps = store.steps;
-  for(let i=0;i<steps;i++){
-    const p = path.getPointAtLength(len*(i/(steps-1)));
-    const node = document.createElement('div');
-    node.className='node '+(i===0?'current unlocked':'unlocked');
-    node.style.left = (p.x-27)+'px';
-    node.style.top = (p.y-27)+'px';
-    node.innerHTML = `<div class="lvl">L${i+1}</div><div class="dot"></div>`;
-    nodesHost.appendChild(node);
-  }
-}
-placeNodes();
-
-function updateNodes(){
-  const nodes = [...document.querySelectorAll('.node')];
-  const totalXP = store.xp.me + store.xp.partner;
-  const perStep = 10; // unlock per 10 total XP
-  nodes.forEach((n,idx)=>{
-    const need = idx*perStep;
-    n.classList.toggle('unlocked', totalXP >= need);
-    n.classList.toggle('done', totalXP >= need+perStep);
-    n.classList.toggle('current', totalXP >= need && totalXP < need+perStep);
-  });
-}
-
-/* ===== quests ===== */
-function renderQuests(){
-  const box=$('quests'); box.innerHTML='';
-  store.quests.forEach(q=>{
-    const div=document.createElement('div');
-    div.className='quest'+(q.done?' done':'');
-    div.innerHTML = `<div class="tick">${q.done?'✔️':''}</div><div style="flex:1">${q.text}</div>`;
-    const tick=div.querySelector('.tick');
-    tick.addEventListener('click', ()=>{
-      q.done=!q.done; div.classList.toggle('done', q.done);
-      if(q.done){ addXP('me',2); addFeed('daily','Both','Completed a micro-quest'); confetti(innerWidth-80, innerHeight-120, 40); }
-      renderBadges();
-    });
-    box.appendChild(div);
-  });
-}
-renderQuests();
-
-/* ===== feed ===== */
+/* === feed === */
 function addFeed(kind, who, text){
-  store.feed.unshift({kind, who, text, when:new Date()});
+  state.feed.unshift({kind, who, text, when: new Date()});
   renderFeed();
+  // bump harmony a little for positive actions
+  setHarmony(state.harmony + (kind==='wish'?2: kind==='app'?1:3));
 }
 function renderFeed(){
-  const feed=$('feed');
-  if(!store.feed.length){ feed.innerHTML='<div class="empty">No activity yet. Tap <b>＋</b> to add.</div>'; return; }
-  feed.innerHTML='';
-  store.feed.forEach(it=>{
-    const el=document.createElement('div');
-    const tclass = it.kind==='appreciation'?'app': it.kind==='wish'?'wish':'sum';
-    el.className='item type-'+tclass+' pop';
-    el.innerHTML = `<div class="dot"></div><div style="flex:1"><div>${it.text}</div><div class="meta">— ${it.who} • ${timeStr(it.when)}</div></div>`;
-    feed.appendChild(el);
+  const box = $('feed'); box.innerHTML='';
+  if(!state.feed.length){ box.innerHTML='<div class="empty">Nothing yet.</div>'; return; }
+  state.feed.forEach(it=>{
+    const row = document.createElement('div'); row.className='row';
+    const dot = document.createElement('div'); dot.style.width='10px'; dot.style.height='10px'; dot.style.borderRadius='50%';
+    dot.style.background = it.kind==='app' ? 'var(--g1)' : it.kind==='wish' ? 'var(--g3)' : 'var(--g2)';
+    const card = document.createElement('div'); card.className='card'; card.style.padding='10px'; card.style.flex='1';
+    card.innerHTML = `<div>${it.text}</div><div class="sub" style="margin-top:4px">${new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(it.when)} • ${it.who}</div>`;
+    row.appendChild(dot); row.appendChild(card); box.appendChild(row);
   });
 }
+$('addToday').onclick = ()=>{
+  const a = $('appreciation').value.trim();
+  const w = $('wish').value.trim();
+  if(a){ addFeed('app','You',a); $('appreciation').value=''; }
+  if(w){ addFeed('wish','You',w); $('wish').value=''; }
+};
 
-/* ===== XP / badges / streak ===== */
-function addXP(who, amount){
-  store.xp[who]+=amount;
-  $('meXP').textContent=store.xp.me; $('ptXP').textContent=store.xp.partner;
-  const total = store.xp.me + store.xp.partner;
-  $('xpBadge').textContent = `XP ${total} • Streak ${store.streak}🔥`;
-  updateNodes();
+/* === Memory Vine === */
+function placeLeaf(url, cap){
+  const host = $('leaves');
+  const path = document.getElementById('stem');
+  const L = path.getTotalLength();
+  const i = state.leaves.length;
+  const t = Math.min(0.1 + i*0.08, .95);
+  const p = path.getPointAtLength(L*t);
+  const leaf = document.createElement('div');
+  leaf.className='leaf pop';
+  leaf.style.left = (p.x - 36) + 'px';
+  leaf.style.top  = (p.y - 36) + 'px';
+  leaf.innerHTML = url ? `<img src="${url}" alt=""><div class="cap">${cap||''}</div>` : `<div class="cap">${cap||''}</div>`;
+  host.appendChild(leaf);
 }
-function renderBadges(){
-  $('streakN').textContent = store.streak;
-}
+$('addLeaf').onclick = ()=>{
+  const url = $('memUrl').value.trim(); const cap = $('memCap').value.trim();
+  if(!url && !cap) return;
+  state.leaves.push({url, cap});
+  placeLeaf(url, cap);
+  $('memUrl').value=''; $('memCap').value='';
+  setHarmony(state.harmony + 2);
+};
 
-/* ===== debates ===== */
+/* === Listen Duel === */
+let lInt=null, lSec=90;
+const setL = s => $('l_timer').textContent = new Date(s*1000).toISOString().substring(14,19);
+setL(90);
+$('l_start').onclick = ()=>{
+  if(lInt){ clearInterval(lInt); lInt=null; }
+  lSec=90; setL(lSec);
+  lInt = setInterval(()=>{ lSec--; setL(lSec); if(lSec<=0){ clearInterval(lInt); lInt=null; }},1000);
+};
+$('l_add').onclick = ()=>{
+  const w = $('l_word').value.trim();
+  if(!w) return;
+  const chip = document.createElement('span'); chip.className='chip'; chip.textContent = w;
+  $('l_words').appendChild(chip); $('l_word').value='';
+  if($('l_words').children.length>=3) $('l_add').disabled=true;
+};
+$('l_finish').onclick = ()=>{
+  const words = [...$('l_words').children].map(x=>x.textContent);
+  if(words.length<3){ alert('Add exactly 3 words you heard.'); return; }
+  addFeed('note','Referee',`🎧 Listener caught: ${words.join(' • ')}`);
+  $('l_words').innerHTML=''; $('l_add').disabled=false; $('l_me').value='';
+  setHarmony(state.harmony + 8);
+};
+
+/* === Debate Lab === */
 function guessLang(t){
   if(/[\u0400-\u04FF]/.test(t)) return 'uk';
   const pt=[' que ',' não ',' você ',' pra ',' de ',' é ',' ao ',' à ',' meu ',' minha ',' seu ',' sua ',' com '];
-  const L=' '+t.toLowerCase()+' '; return pt.some(w=>L.includes(w))?'pt':'en';
+  const L=(' '+t.toLowerCase()+' '); return pt.some(w=>L.includes(w))?'pt':'en';
 }
-function summarizeLocal(title, mine, partner, target){
+function referee(title, mine, partner, target){
   const T={
-    en:(t,m,p)=>`Referee (${t}): You both care. You: “${m.slice(0,90)}…”. Partner: “${p.slice(0,90)}…”. Next: one 48-hour test, then check in.`,
-    pt:(t,m,p)=>`Árbitro (${t}): Vocês se importam. Você: “${m.slice(0,90)}…”. Parceira(o): “${p.slice(0,90)}…”. Próximo: 1 teste de 48h, revisar depois.`,
-    uk:(t,m,p)=>`Рефері (${t}): Вам обом важливо. Ви: «${m.slice(0,90)}…». Партнер(ка): «${p.slice(0,90)}…». Далі: один тест на 48 год і перевірка.`
+    en:(t,m,p)=>`Referee (${t}): You both care. You: “${m.slice(0,90)}…”. Partner: “${p.slice(0,90)}…”. Tiny next step: 48-hour test, then check in.`,
+    pt:(t,m,p)=>`Árbitro (${t}): Vocês se importam. Você: “${m.slice(0,90)}…”. Parceira(o): “${p.slice(0,90)}…”. Passo pequeno: teste de 48h e revisar.`,
+    uk:(t,m,p)=>`Рефері (${t}): Вам обом важливо. Ви: «${m.slice(0,90)}…». Партнер(ка): «${p.slice(0,90)}…». Малий крок: тест на 48 год, потім перевірка.`
   }; return (T[target]||T.en)(title,mine,partner);
 }
-$('refereeBtn').addEventListener('click', ()=>{
-  const title=$('debTitle').value.trim(), mine=$('debMine').value.trim(), partner=$('debPartner').value.trim();
-  if(!title||!mine||!partner) return;
-  const sel=$('debLang').value;
-  const target = sel!=='auto' ? sel : (guessLang(partner)||'uk');
-  const out = summarizeLocal(title, mine, partner, target);
-  $('refereeText').textContent = out;
-  $('refereeMeta').textContent = `→ ${target.toUpperCase()} • fair & short`;
-  $('refereeCard').style.display='flex';
-});
-$('saveDebate').addEventListener('click', ()=>{
-  const title=$('debTitle').value.trim();
-  const sum=$('refereeText').textContent.trim();
-  if(!title||!sum) return;
-  const id=Math.random().toString(36).slice(2,9);
-  store.debates.unshift({id,title,summary:sum});
-  $('debTitle').value=''; $('debMine').value=''; $('debPartner').value=''; $('refereeCard').style.display='none';
-  renderDebates();
-  addFeed('summary','Referee',`“${title}” → plan posted`);
-  addXP('me',1); addXP('partner',1);
-  confetti(innerWidth/2, innerHeight/3, 90);
-  toast('Debate posted');
-});
-function renderDebates(){
-  const list=$('debateList'); if(!store.debates.length){ list.innerHTML='<div class="empty">No debates yet.</div>'; return; }
-  list.innerHTML='';
-  store.debates.forEach(d=>{
-    const row=document.createElement('div'); row.className='item';
-    row.innerHTML = `<div class="dot" style="background:${'var(--lilac)'}"></div>
-      <div style="flex:1">
-        <div><strong>${d.title}</strong></div>
-        <div class="meta">${d.summary}</div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" data-who="me">✔️ I followed</button>
-          <button class="btn" data-who="partner">✔️ Partner followed</button>
-          <button class="btn" data-who="none">✖️ Skip</button>
-        </div>
-      </div>`;
-    row.querySelectorAll('button').forEach(b=> b.addEventListener('click', ()=>{
-      const who=b.dataset.who;
-      if(who==='me'){ addXP('me',3); addFeed('summary','Me',`Followed debate: ${d.title}`); }
-      else if(who==='partner'){ addXP('partner',3); addFeed('summary','Partner',`Followed debate: ${d.title}`); }
-      row.remove();
-      confetti(innerWidth-80, innerHeight-120, 50);
-    }));
+$('d_ref').onclick = ()=>{
+  const t=$('d_title').value.trim(), m=$('d_me').value.trim(), p=$('d_pt').value.trim();
+  if(!t||!m||!p) return;
+  const sel=$('d_lang').value;
+  const to = sel!=='auto' ? sel : (guessLang(p)||'uk');
+  const out = referee(t,m,p,to);
+  $('d_out').textContent = out; $('d_meta').textContent = `→ ${to.toUpperCase()} • neutral plan`;
+  $('d_card').style.display='block';
+};
+$('d_post').onclick = ()=>{
+  const txt = $('d_out').textContent.trim(); if(!txt) return;
+  addFeed('note','Referee', txt);
+  $('d_title').value=''; $('d_me').value=''; $('d_pt').value=''; $('d_card').style.display='none';
+  setHarmony(state.harmony + 10);
+};
+
+/* === Plan Quest === */
+const ideas = [
+  (theme)=>[
+    `Scout a ${theme||'photo walk'} route (10 min)`,
+    `Pack dog treats + water`,
+    `Pick 1 “us” photo prompt`,
+    `20-min walk • 6 photos max`,
+    `Warm drink debrief: 3 nice moments`
+  ],
+  (theme)=>[
+    `Find a ${theme||'coffee'} spot you’ve never tried`,
+    `Each brings 1 question`,
+    `Phones face-down for 20min`,
+    `Swap 1 appreciation`,
+    `Take 1 candid dog pic`
+  ]
+];
+function makePlan(){
+  const theme = $('p_theme').value.trim();
+  const arr = ideas[Math.floor(Math.random()*ideas.length)](theme);
+  const list = $('p_list'); list.innerHTML='';
+  arr.forEach(step=>{
+    const row=document.createElement('div'); row.className='check';
+    row.innerHTML = `<div class="tick"> </div><div style="flex:1">${step}</div>`;
+    const tick = row.querySelector('.tick');
+    tick.onclick = ()=>{ row.classList.toggle('done'); if(row.classList.contains('done')) setHarmony(state.harmony+3); };
     list.appendChild(row);
   });
 }
+$('p_make').onclick = makePlan;
 
-/* ===== add sheet ===== */
-const sheet=$('sheet'), form=$('form');
-$('fab').addEventListener('click', ()=>{ sheet.classList.add('show'); form.innerHTML=''; $('saveBtn').style.display='none'; });
-$('closeSheet').addEventListener('click', ()=> sheet.classList.remove('show'));
-$('addApp').addEventListener('click', ()=>{
-  form.innerHTML = `<textarea id="t" placeholder="💚 1–2 sentences…"></textarea>`; $('saveBtn').style.display='inline-block';
-  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('appreciation','Me',v); addXP('me',1); sheet.classList.remove('show'); toast('Added'); confetti(innerWidth-60, innerHeight-140, 40); };
-});
-$('addWish').addEventListener('click', ()=>{
-  form.innerHTML = `<textarea id="t" placeholder="🧸 I feel… when… I’d love if…"></textarea>`; $('saveBtn').style.display='inline-block';
-  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('wish','Me',v); addXP('me',2); sheet.classList.remove('show'); toast('Added'); confetti(80, innerHeight-120, 50); };
-});
-$('addDeb').addEventListener('click', ()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  document.querySelector('[data-scr="debates"]').classList.add('active');
-  ['journey','scores'].forEach(k=> $('screen-'+k).style.display='none');
-  $('screen-debates').style.display='block';
-  sheet.classList.remove('show');
-});
+/* === + sheet (quick add) === */
+const sheet=$('sheet'), form=$('sheetForm'), save=$('sheetSave');
+$('fab').onclick=()=>{ sheet.classList.add('show'); form.innerHTML=''; save.style.display='none'; };
+$('closeSheet').onclick=()=> sheet.classList.remove('show');
 
-/* ===== names / avatars (simple) ===== */
-$('editNames').addEventListener('click', ()=>{
-  const me = prompt('Your name', $('meName').textContent || 'You') || 'You';
-  const pt = prompt('Partner name', $('ptName').textContent || 'Partner') || 'Partner';
-  $('meName').textContent = me; $('ptName').textContent = pt;
-  const meEmoji = prompt('Pick your avatar emoji (e.g., 🦊, 🐼, 🐸)', '🦊') || '🦊';
-  const ptEmoji = prompt('Partner avatar emoji', '🐣') || '🐣';
-  $('meAva').textContent = meEmoji; $('ptAva').textContent = ptEmoji;
-  toast('Saved');
-});
+$('quickApp').onclick=()=>{
+  form.innerHTML = `<textarea id="qTxt" placeholder="💚 Appreciation…"></textarea>`; save.style.display='inline-block';
+  save.onclick=()=>{ const t=$('qTxt').value.trim(); if(!t) return; addFeed('app','You',t); sheet.classList.remove('show'); };
+};
+$('quickWish').onclick=()=>{
+  form.innerHTML = `<textarea id="qTxt" placeholder="🧸 I feel… when… I’d love if…"></textarea>`; save.style.display='inline-block';
+  save.onclick=()=>{ const t=$('qTxt').value.trim(); if(!t) return; addFeed('wish','You',t); sheet.classList.remove('show'); };
+};
+$('quickNote').onclick=()=>{
+  form.innerHTML = `<textarea id="qTxt" placeholder="📝 Note / idea…"></textarea>`; save.style.display='inline-block';
+  save.onclick=()=>{ const t=$('qTxt').value.trim(); if(!t) return; addFeed('note','You',t); sheet.classList.remove('show'); };
+};
 
-/* ===== nav ===== */
-document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
-  const scr=b.dataset.scr;
-  ['journey','debates','scores'].forEach(k=> $('screen-'+k).style.display = (k===scr)?'block':'none');
-}));
+/* === style btn (future theme picker) === */
+$('styleBtn').onclick = ()=> alert('Theme picker coming next. For now, enjoy the animated glass + orb vibe.');
 
-/* ===== start ===== */
-function start(){
-  placeNodes(); updateNodes(); renderFeed(); renderDebates();
-  // sweet entry confetti on first time
-  setTimeout(()=> confetti(innerWidth/2, innerHeight/3, 80), 500);
-}
-start();
+/* === demo seed === */
+addFeed('app','You','Loved your smile during breakfast.');
+addFeed('wish','You','I feel rushed when we’re late; could we leave 10 min earlier?');
+placeLeaf('https://images.unsplash.com/photo-1558944351-cbcf07c2a259?q=80&w=800&auto=format&fit=crop','Dog park + new camera');
+makePlan();
 </script>
 </body>
 </html>
