@@ -3,57 +3,89 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Us — Journey</title>
+<title>Us — Journey (Playful)</title>
 <meta name="theme-color" content="#ffffff" />
 <style>
   :root{
-    --bg:#f9fafc; --card:#ffffff; --ink:#182033; --muted:#77819b; --line:#e9edf6;
-    --brand:#6ee7b7; --brand2:#93c5fd; --coral:#ffb4a8; --lilac:#c7b4ff; --gold:#f8d26a;
-    --ok:#4ad69a; --warn:#f7b267; --bad:#ff7b7b;
-    --r:16px; --shadow:0 8px 24px rgba(0,0,0,.06); --bar:64px; --fab:64px;
+    /* palette — soft, playful */
+    --bg:#f9fafc; --card:#ffffff; --ink:#141a2e; --muted:#7a849d; --line:#e8edf6;
+    --mint:#72e4c1; --sky:#9fc2ff; --lilac:#c9b5ff; --coral:#ffb8a8; --lemon:#f9df7a;
+    --green:#41d39a; --pink:#ff9bb0; --blue:#6aa7ff; --gold:#f7c84a;
+    --r:18px; --shadow:0 10px 28px rgba(0,0,0,.08); --bar:64px; --fab:66px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{
-    margin:0; color:var(--ink); background:var(--bg);
+    margin:0; color:var(--ink); background:
+      radial-gradient(900px 600px at -10% -10%, #f2f6ff 0%, transparent 60%),
+      radial-gradient(1000px 700px at 120% -20%, #f3fff7 0%, transparent 60%),
+      var(--bg);
     font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
   }
-  /* top */
+
+  /* top bar */
   .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px;
-    padding:12px 14px;background:linear-gradient(180deg,#fff,#ffffffcc);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+    padding:12px 14px;background:linear-gradient(180deg,#fff,#ffffffdd);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
   .brand{display:flex;gap:10px;align-items:center}
-  .logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+  .logo{width:36px;height:36px;border-radius:12px;background:conic-gradient(from 0deg, var(--mint), var(--sky), var(--lilac), var(--coral), var(--mint))}
   h1{margin:0;font-size:18px}
   .muted{color:var(--muted);font-size:12px}
-  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 14px;font-weight:700}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 14px;font-weight:800}
   .btn.ghost{background:#fff}
-  .btn.fill{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#053}
   .chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;background:#fff}
 
-  /* content */
+  /* layout */
   .wrap{padding:12px 12px calc(var(--bar)+24px)}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
   .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;outline:none}
-  textarea{min-height:90px;resize:vertical}
-  .empty{color:#8fa0bd;text-align:center;padding:16px}
+  input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:16px;outline:none}
+  textarea{min-height:88px;resize:vertical}
+  .empty{color:#8ea0bd;text-align:center;padding:16px}
 
-  /* journey dots */
-  .journey{display:flex;gap:10px;overflow:auto;padding:4px}
-  .step{min-width:120px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
-  .step.locked{opacity:.55}
-  .step .lvl{font-weight:900}
-  .step .xp{font-size:12px;color:#5a6b8c}
-  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;background:#eef6ff;border:1px solid var(--line)}
+  /* Journey path */
+  .journey-wrap{position:relative; height:300px; overflow:hidden; border-radius:16px; background:linear-gradient(180deg,#ffffff,#fcfdff)}
+  .journey-bg{position:absolute; inset:0; background:
+      radial-gradient(60px 60px at 10% 20%, #fff6 0, transparent 60%),
+      radial-gradient(80px 80px at 80% 10%, #fff6 0, transparent 60%),
+      radial-gradient(80px 80px at 20% 90%, #fff6 0, transparent 60%);
+    pointer-events:none}
+  svg#line{position:absolute; inset:0}
+  .node{
+    position:absolute; width:54px; height:54px; border-radius:50%;
+    background:#fff; border:2px solid var(--line); display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.06);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  .node.unlocked{border-color:#cfe7ff}
+  .node .dot{width:14px;height:14px;border-radius:50%; background:#d0d7eb}
+  .node.unlocked .dot{background:linear-gradient(135deg,var(--mint),var(--sky))}
+  .node.current{transform:scale(1.06)}
+  .node.done .dot{background:linear-gradient(135deg,var(--green),#a8ffd7)}
+  .node .lvl{position:absolute; top:-22px; font-size:12px; color:#6a7696; font-weight:800}
+  .node .badge{position:absolute; bottom:-22px; font-size:12px; color:#1b6f4a; font-weight:900}
 
-  /* feed / list */
-  .item{display:flex;gap:10px;padding:12px;border-radius:12px;background:#fff;border:1px solid var(--line)}
-  .dot{width:10px;height:10px;border-radius:50%}
-  .type-app .dot{background:var(--ok)}
+  /* feed items */
+  .item{display:flex;gap:10px;padding:12px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .type-app .dot{background:var(--green)}
   .type-wish .dot{background:var(--coral)}
-  .type-debate .dot{background:var(--lilac)}
+  .type-sum .dot{background:var(--lilac)}
   .meta{color:#7b88a6;font-size:12px;margin-top:6px}
+  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;background:#fff}
+
+  /* micro quests */
+  .quest{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .quest .tick{width:24px;height:24px;border-radius:50%;border:2px solid #cfe0ff;display:grid;place-items:center;cursor:pointer}
+  .quest.done{opacity:.6}
+  .quest.done .tick{background:linear-gradient(135deg,var(--mint),var(--sky)); color:#063; border-color:transparent}
+
+  /* avatars/badges */
+  .avatars{display:flex; gap:10px; align-items:center}
+  .ava{width:36px;height:36px;border-radius:50%; background:#fff; border:2px solid var(--line); display:grid; place-items:center; font-size:18px}
+  .badges{display:flex; gap:8px; flex-wrap:wrap}
+  .badgeIcon{font-size:18px; display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%;
+    background:#fff; border:1px solid var(--line)}
 
   /* bottom nav */
   .nav{position:fixed;bottom:0;inset-inline:0;height:var(--bar);display:flex;justify-content:space-around;align-items:center;
@@ -64,10 +96,10 @@
 
   /* fab */
   .fab{position:fixed;right:16px;bottom:calc(var(--bar)+16px);width:var(--fab);height:var(--fab);border-radius:50%;
-    background:linear-gradient(135deg,var(--brand),var(--brand2));color:#063;border:none;font-size:30px;font-weight:900;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+    background:conic-gradient(from 0deg,var(--mint),var(--sky),var(--lilac));color:#042;border:none;font-size:30px;font-weight:900;box-shadow:0 14px 32px rgba(0,0,0,.18)}
 
   /* sheet */
-  .backdrop{position:fixed;inset:0;display:none;background:rgba(0,0,0,.2);backdrop-filter:blur(6px);align-items:flex-end;z-index:30}
+  .backdrop{position:fixed;inset:0;display:none;background:rgba(0,0,0,.18);backdrop-filter:blur(6px);align-items:flex-end;z-index:30}
   .sheet{width:100%;border-top-left-radius:18px;border-top-right-radius:18px;background:#fff;border-top:1px solid var(--line);padding:14px 12px 18px}
   .show{display:flex}
 
@@ -75,68 +107,82 @@
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar)+var(--fab)+12px);background:#fff;border:1px solid var(--line);
     color:#173; padding:10px 14px;border-radius:999px;display:none;z-index:40;box-shadow:var(--shadow)}
   .toast.show{display:block}
+
+  /* fun animations */
+  @keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  .pop{animation:pop .25s ease}
 </style>
 </head>
 <body>
+  <!-- Top -->
   <div class="top">
     <div class="brand">
       <div class="logo" aria-hidden="true"></div>
       <div>
         <h1>Us — Journey</h1>
-        <div class="muted" id="status">Demo • light</div>
+        <div class="muted">Playful • light mode</div>
       </div>
     </div>
-    <div class="row">
-      <button class="btn ghost" id="settingsBtn">⚙️</button>
+    <div class="row avatars">
+      <div class="ava" id="meAva">🦊</div>
+      <div class="ava" id="ptAva">🐣</div>
+      <button class="btn" id="editNames">✏️</button>
     </div>
   </div>
 
   <main class="wrap">
-    <!-- Journey -->
+    <!-- Journey Map -->
     <section id="screen-journey">
       <div class="card">
         <div class="title">
           <strong>Journey</strong>
-          <span class="badge" id="xpBadge">XP 0 • Streak 0🔥</span>
+          <span class="pill" id="xpBadge">XP 0 • Streak 0🔥</span>
         </div>
-        <div class="journey" id="journeyStrip"></div>
+        <div class="journey-wrap">
+          <svg id="line" viewBox="0 0 400 300" preserveAspectRatio="none">
+            <!-- playful squiggle path -->
+            <path id="path" d="M20,270 C60,210 90,210 120,260 C150,310 210,310 240,250 C270,195 300,190 340,230"
+                  fill="none" stroke="url(#grad)" stroke-width="10" stroke-linecap="round" stroke-opacity="0.3"/>
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#72e4c1"/><stop offset="100%" stop-color="#9fc2ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="journey-bg"></div>
+          <!-- nodes are positioned by JS -->
+          <div id="nodes"></div>
+        </div>
       </div>
 
       <div class="card">
         <div class="title">
-          <strong>Activity feed</strong>
-          <span class="chip">+1 app • +2 wish • +3 win</span>
+          <strong>Micro-quests (today)</strong>
+          <span class="chip">finish all = +4 XP</span>
         </div>
-        <div id="feed"><div class="empty">No activity yet. Tap <b>＋</b> to start a challenge.</div></div>
-      </div>
-    </section>
-
-    <!-- Daily Challenge -->
-    <section id="screen-daily" style="display:none">
-      <div class="card">
-        <div class="title"><strong>Daily Challenge</strong><span class="chip" id="dailyChip"></span></div>
-        <div class="item" style="align-items:flex-start">
-          <div class="dot" style="background:var(--gold)"></div>
-          <div style="flex:1">
-            <div id="dailyText">Loading…</div>
-            <div class="meta" id="dailyMeta"></div>
-          </div>
-          <button class="btn fill" id="completeDaily">Complete</button>
-        </div>
+        <div class="row" id="quests"></div>
       </div>
 
       <div class="card">
-        <div class="title"><strong>Quick Add</strong><span class="chip">tiny is best</span></div>
-        <div class="row"><input id="quickApp" placeholder="💚 1-line appreciation"/></div>
-        <div class="row"><input id="quickWish" placeholder="🧸 1-line gentle wish"/></div>
-        <div class="row"><button class="btn fill" id="saveQuick">Save</button></div>
+        <div class="title"><strong>Activity</strong><span class="chip">💚 +1 • 🧸 +2 • ⚖️ +3</span></div>
+        <div id="feed"><div class="empty">No activity yet. Tap <b>＋</b> to add.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="title"><strong>Badges</strong><span class="chip">collect & flex</span></div>
+        <div class="badges" id="badges">
+          <div class="badgeIcon" title="First step">🥇</div>
+          <div class="badgeIcon" title="3-day streak">🔥</div>
+          <div class="badgeIcon" title="7 appreciations">💚</div>
+          <div class="badgeIcon" title="Calm debate">🫖</div>
+        </div>
       </div>
     </section>
 
     <!-- Debates -->
     <section id="screen-debates" style="display:none">
       <div class="card">
-        <div class="title"><strong>Today’s Debate</strong><span class="chip">fair & kind</span></div>
+        <div class="title"><strong>Debate Arena</strong><span class="chip">fair & kind</span></div>
         <div class="row"><input id="debTitle" placeholder="Problem title (short)"/></div>
         <div class="row"><textarea id="debMine" placeholder="My view (any language)"></textarea></div>
         <div class="row"><textarea id="debPartner" placeholder="Partner’s view (any language)"></textarea></div>
@@ -155,7 +201,7 @@
             <div id="refereeText"></div>
             <div class="meta" id="refereeMeta"></div>
           </div>
-          <button class="btn fill" id="saveDebate">Post</button>
+          <button class="btn" id="saveDebate" style="background:linear-gradient(135deg,var(--mint),var(--sky));color:#063">Post</button>
         </div>
       </div>
 
@@ -169,13 +215,12 @@
     <section id="screen-scores" style="display:none">
       <div class="card">
         <div class="title"><strong>Leaderboard</strong><span class="chip">friendly only 😄</span></div>
-        <div class="item"><div class="dot" style="background:var(--ok)"></div><div style="flex:1"><strong id="meName">You</strong><div class="meta"><span id="meXP">0</span> XP</div></div></div>
-        <div class="item" style="margin-top:8px"><div class="dot" style="background:var(--brand2)"></div><div style="flex:1"><strong id="ptName">Partner</strong><div class="meta"><span id="ptXP">0</span> XP</div></div></div>
+        <div class="item"><div class="dot" style="background:var(--green)"></div><div style="flex:1"><strong id="meName">You</strong><div class="meta"><span id="meXP">0</span> XP</div></div></div>
+        <div class="item" style="margin-top:8px"><div class="dot" style="background:var(--sky)"></div><div style="flex:1"><strong id="ptName">Partner</strong><div class="meta"><span id="ptXP">0</span> XP</div></div></div>
       </div>
-
       <div class="card">
-        <div class="title"><strong>Goals</strong><span class="chip">unlock levels</span></div>
-        <div class="item"><div class="dot" style="background:var(--gold)"></div><div>Streak <b id="streakN">0</b> days • Next: keep 3-day streak for <b>Level 2</b></div></div>
+        <div class="title"><strong>Streak & Goals</strong><span class="chip">unlock levels</span></div>
+        <div class="item"><div class="dot" style="background:var(--gold)"></div><div>Streak <b id="streakN">0</b> days • Next: keep a 3-day streak for <b>Level 2</b></div></div>
       </div>
     </section>
   </main>
@@ -183,7 +228,6 @@
   <!-- bottom nav -->
   <nav class="nav">
     <button class="tab active" data-scr="journey"><div class="ico">🗺️</div>Journey</button>
-    <button class="tab" data-scr="daily"><div class="ico">⭐</div>Daily</button>
     <button class="tab" data-scr="debates"><div class="ico">⚖️</div>Debates</button>
     <button class="tab" data-scr="scores"><div class="ico">🏆</div>Scores</button>
   </nav>
@@ -201,132 +245,154 @@
         <button class="btn" id="addDeb">⚖️ Debate</button>
       </div>
       <div id="form" style="margin-top:10px"></div>
-      <div class="row" style="margin-top:10px"><button class="btn fill" id="saveBtn" style="display:none">Save</button></div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="saveBtn" style="display:none;background:linear-gradient(135deg,var(--mint),var(--sky));color:#063">Save</button></div>
     </div>
   </div>
 
   <div class="toast" id="toast">Saved</div>
 
+  <!-- confetti canvas -->
+  <canvas id="fx" style="position:fixed;inset:0;pointer-events:none;z-index:50"></canvas>
+
 <script>
-/* ===== simple demo store (no backend) ===== */
+/* ===== tiny store (demo) ===== */
 const store = {
-  xp: { me:0, partner:0 }, streak: 0,
-  steps: Array.from({length:8}).map((_,i)=>({lvl:i+1, need: i*20, unlocked: i===0})),
-  feed: [],             // {kind, who, text, when}
-  dailyIndex: 0,
-  debates: []           // {id,title,mine,partner,summary,lang,doneBy:'me'|'partner'|null}
+  xp: { me:0, partner:0 }, streak:0,
+  steps: 10,
+  feed: [],
+  debates: [],
+  quests: [
+    {id:'q1', text:'Send 1 concrete appreciation', done:false},
+    {id:'q2', text:'Plan a 10-min walk', done:false},
+    {id:'q3', text:'Use “I feel… when… I’d love if…” once', done:false},
+  ]
 };
 
-/* ===== ui helpers ===== */
+/* ===== helpers ===== */
 const $ = id=>document.getElementById(id);
-const tabs = document.querySelectorAll('.tab');
-tabs.forEach(b=>b.addEventListener('click', ()=>{
-  tabs.forEach(x=>x.classList.remove('active')); b.classList.add('active');
-  const scr=b.dataset.scr;
-  ['journey','daily','debates','scores'].forEach(k=> document.getElementById('screen-'+k).style.display = (k===scr)?'block':'none');
-}));
+const toast = (m='Saved')=>{ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); };
+function timeStr(d){ return new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(d); }
 
-function toast(msg='Saved'){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
-
-function addXP(who, amount){
-  store.xp[who]+=amount;
-  $('meXP').textContent = store.xp.me;
-  $('ptXP').textContent = store.xp.partner;
-  const total = store.xp.me + store.xp.partner;
-  const lvl = store.steps.findLast(s=> total >= s.need) || store.steps[0];
-  store.steps.forEach(s=> s.unlocked = total >= s.need);
-  renderJourney();
-  renderBadges();
+/* ===== confetti (cute + tiny) ===== */
+const ctx = $('fx').getContext('2d');
+function resizeFx(){ $('fx').width=innerWidth; $('fx').height=innerHeight }
+addEventListener('resize', resizeFx); resizeFx();
+let confs=[];
+function confetti(x=innerWidth/2,y=innerHeight/2,count=80){
+  for(let i=0;i<count;i++){
+    confs.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()*-4-2), g:0.12, s:Math.random()*4+2, c:`hsl(${Math.random()*360},80%,60%)`, life:Math.random()*60+30});
+  }
 }
+function loop(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  confs = confs.filter(p=>p.life>0);
+  confs.forEach(p=>{
+    p.life--; p.x+=p.vx; p.y+=p.vy; p.vy+=p.g;
+    ctx.fillStyle=p.c; ctx.fillRect(p.x, p.y, p.s, p.s);
+  });
+  requestAnimationFrame(loop);
+}
+loop();
 
-function renderJourney(){
-  const strip=$('journeyStrip'); strip.innerHTML='';
-  store.steps.forEach(s=>{
-    const div=document.createElement('div');
-    div.className='step'+(s.unlocked?'':' locked');
-    div.innerHTML=`<div class="lvl">Level ${s.lvl}</div><div class="xp">${s.need} XP</div>`;
-    strip.appendChild(div);
+/* ===== journey path nodes ===== */
+function placeNodes(){
+  const svg = document.getElementById('line');
+  const path = document.getElementById('path');
+  const nodesHost = document.getElementById('nodes');
+  nodesHost.innerHTML='';
+
+  const len = path.getTotalLength();
+  const steps = store.steps;
+  for(let i=0;i<steps;i++){
+    const p = path.getPointAtLength(len*(i/(steps-1)));
+    const node = document.createElement('div');
+    node.className='node '+(i===0?'current unlocked':'unlocked');
+    node.style.left = (p.x-27)+'px';
+    node.style.top = (p.y-27)+'px';
+    node.innerHTML = `<div class="lvl">L${i+1}</div><div class="dot"></div>`;
+    nodesHost.appendChild(node);
+  }
+}
+placeNodes();
+
+function updateNodes(){
+  const nodes = [...document.querySelectorAll('.node')];
+  const totalXP = store.xp.me + store.xp.partner;
+  const perStep = 10; // unlock per 10 total XP
+  nodes.forEach((n,idx)=>{
+    const need = idx*perStep;
+    n.classList.toggle('unlocked', totalXP >= need);
+    n.classList.toggle('done', totalXP >= need+perStep);
+    n.classList.toggle('current', totalXP >= need && totalXP < need+perStep);
   });
 }
 
-function renderBadges(){
-  $('xpBadge').textContent = `XP ${store.xp.me + store.xp.partner} • Streak ${store.streak}🔥`;
+/* ===== quests ===== */
+function renderQuests(){
+  const box=$('quests'); box.innerHTML='';
+  store.quests.forEach(q=>{
+    const div=document.createElement('div');
+    div.className='quest'+(q.done?' done':'');
+    div.innerHTML = `<div class="tick">${q.done?'✔️':''}</div><div style="flex:1">${q.text}</div>`;
+    const tick=div.querySelector('.tick');
+    tick.addEventListener('click', ()=>{
+      q.done=!q.done; div.classList.toggle('done', q.done);
+      if(q.done){ addXP('me',2); addFeed('daily','Both','Completed a micro-quest'); confetti(innerWidth-80, innerHeight-120, 40); }
+      renderBadges();
+    });
+    box.appendChild(div);
+  });
 }
+renderQuests();
 
+/* ===== feed ===== */
 function addFeed(kind, who, text){
-  store.feed.unshift({kind, who, text, when: new Date()});
+  store.feed.unshift({kind, who, text, when:new Date()});
   renderFeed();
 }
-
 function renderFeed(){
   const feed=$('feed');
-  if(!store.feed.length){ feed.innerHTML='<div class="empty">No activity yet. Tap <b>＋</b> to start a challenge.</div>'; return; }
+  if(!store.feed.length){ feed.innerHTML='<div class="empty">No activity yet. Tap <b>＋</b> to add.</div>'; return; }
   feed.innerHTML='';
   store.feed.forEach(it=>{
-    const li=document.createElement('div');
-    li.className='item type-'+(it.kind==='appreciation'?'app':'wish');
-    if(it.kind==='summary' || it.kind==='debate') li.className='item type-debate';
-    const when = new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(it.when);
-    li.innerHTML=`<div class="dot"></div><div style="flex:1"><div>${it.text}</div><div class="meta">— ${it.who} • ${when}</div></div>`;
-    feed.appendChild(li);
+    const el=document.createElement('div');
+    const tclass = it.kind==='appreciation'?'app': it.kind==='wish'?'wish':'sum';
+    el.className='item type-'+tclass+' pop';
+    el.innerHTML = `<div class="dot"></div><div style="flex:1"><div>${it.text}</div><div class="meta">— ${it.who} • ${timeStr(it.when)}</div></div>`;
+    feed.appendChild(el);
   });
 }
 
-/* ===== daily challenge ===== */
-const DAILIES = [
-  "Send 1 concrete appreciation.",
-  "Plan a 10-minute walk together.",
-  "Use “I feel… when…, I’d love if…” once today.",
-  "Do a 5-minute tidy together.",
-  "Share 1 small win from the day.",
-  "Make tomorrow’s mini-plan (2 bullets).",
-];
-function renderDaily(){
-  const i = store.dailyIndex % DAILIES.length;
-  $('dailyText').textContent = DAILIES[i];
-  $('dailyChip').textContent = `Challenge ${i+1}/${DAILIES.length}`;
-  $('dailyMeta').textContent = 'Complete for +2 XP each';
+/* ===== XP / badges / streak ===== */
+function addXP(who, amount){
+  store.xp[who]+=amount;
+  $('meXP').textContent=store.xp.me; $('ptXP').textContent=store.xp.partner;
+  const total = store.xp.me + store.xp.partner;
+  $('xpBadge').textContent = `XP ${total} • Streak ${store.streak}🔥`;
+  updateNodes();
 }
-$('completeDaily').addEventListener('click', ()=>{
-  addXP('me',2); addXP('partner',2);
-  store.streak += 1;
-  addFeed('daily','Both', 'Completed daily challenge');
-  store.dailyIndex++;
-  renderDaily(); renderBadges(); toast('Daily complete +4 XP');
-});
-$('saveQuick').addEventListener('click', ()=>{
-  const a=$('quickApp').value.trim(), w=$('quickWish').value.trim();
-  if(a){ addFeed('appreciation','Me', a); addXP('me',1); $('quickApp').value=''; }
-  if(w){ addFeed('wish','Me', w); addXP('me',2); $('quickWish').value=''; }
-  toast('Saved');
-});
+function renderBadges(){
+  $('streakN').textContent = store.streak;
+}
 
-/* ===== debates (referee) ===== */
+/* ===== debates ===== */
 function guessLang(t){
   if(/[\u0400-\u04FF]/.test(t)) return 'uk';
   const pt=[' que ',' não ',' você ',' pra ',' de ',' é ',' ao ',' à ',' meu ',' minha ',' seu ',' sua ',' com '];
   const L=' '+t.toLowerCase()+' '; return pt.some(w=>L.includes(w))?'pt':'en';
 }
 function summarizeLocal(title, mine, partner, target){
-  // Tiny, kind, neutral referee (2–3 lines)
-  const templates={
-    en: (t,m,p)=>`Referee (${t}): You both care. You said: “${m.slice(0,80)}…”. Partner said: “${p.slice(0,80)}…”. Tiny next step: pick one test for 48h and check in.`,
-    pt: (t,m,p)=>`Árbitro (${t}): Vocês se importam. Você: “${m.slice(0,80)}…”. Parceira(o): “${p.slice(0,80)}…”. Passo pequeno: 1 teste por 48h e revisar.`,
-    uk: (t,m,p)=>`Рефері (${t}): Вам обом не байдуже. Ви: «${m.slice(0,80)}…». Партнер(ка): «${p.slice(0,80)}…». Малий крок: 1 тест на 48 год і перевірка.`
-  };
-  return (templates[target]||templates.en)(title,mine,partner);
+  const T={
+    en:(t,m,p)=>`Referee (${t}): You both care. You: “${m.slice(0,90)}…”. Partner: “${p.slice(0,90)}…”. Next: one 48-hour test, then check in.`,
+    pt:(t,m,p)=>`Árbitro (${t}): Vocês se importam. Você: “${m.slice(0,90)}…”. Parceira(o): “${p.slice(0,90)}…”. Próximo: 1 teste de 48h, revisar depois.`,
+    uk:(t,m,p)=>`Рефері (${t}): Вам обом важливо. Ви: «${m.slice(0,90)}…». Партнер(ка): «${p.slice(0,90)}…». Далі: один тест на 48 год і перевірка.`
+  }; return (T[target]||T.en)(title,mine,partner);
 }
 $('refereeBtn').addEventListener('click', ()=>{
-  const title=$('debTitle').value.trim();
-  const mine=$('debMine').value.trim();
-  const partner=$('debPartner').value.trim();
+  const title=$('debTitle').value.trim(), mine=$('debMine').value.trim(), partner=$('debPartner').value.trim();
   if(!title||!mine||!partner) return;
-  const target = (()=>{
-    const sel = $('debLang').value;
-    if(sel!=='auto') return sel;
-    // pick partner language from their text if present, else default uk
-    const gl = guessLang(partner); return gl || 'uk';
-  })();
+  const sel=$('debLang').value;
+  const target = sel!=='auto' ? sel : (guessLang(partner)||'uk');
   const out = summarizeLocal(title, mine, partner, target);
   $('refereeText').textContent = out;
   $('refereeMeta').textContent = `→ ${target.toUpperCase()} • fair & short`;
@@ -336,20 +402,21 @@ $('saveDebate').addEventListener('click', ()=>{
   const title=$('debTitle').value.trim();
   const sum=$('refereeText').textContent.trim();
   if(!title||!sum) return;
-  const id = Math.random().toString(36).slice(2,9);
-  store.debates.unshift({id,title,summary:sum,doneBy:null});
-  renderDebates();
-  addFeed('debate','Referee',`“${title}” → plan posted`);
-  toast('Debate posted (+1 XP each)'); addXP('me',1); addXP('partner',1);
-  // reset form
+  const id=Math.random().toString(36).slice(2,9);
+  store.debates.unshift({id,title,summary:sum});
   $('debTitle').value=''; $('debMine').value=''; $('debPartner').value=''; $('refereeCard').style.display='none';
+  renderDebates();
+  addFeed('summary','Referee',`“${title}” → plan posted`);
+  addXP('me',1); addXP('partner',1);
+  confetti(innerWidth/2, innerHeight/3, 90);
+  toast('Debate posted');
 });
 function renderDebates(){
   const list=$('debateList'); if(!store.debates.length){ list.innerHTML='<div class="empty">No debates yet.</div>'; return; }
   list.innerHTML='';
   store.debates.forEach(d=>{
     const row=document.createElement('div'); row.className='item';
-    row.innerHTML=`<div class="dot" style="background:${'#c7b4ff'}"></div>
+    row.innerHTML = `<div class="dot" style="background:${'var(--lilac)'}"></div>
       <div style="flex:1">
         <div><strong>${d.title}</strong></div>
         <div class="meta">${d.summary}</div>
@@ -359,12 +426,12 @@ function renderDebates(){
           <button class="btn" data-who="none">✖️ Skip</button>
         </div>
       </div>`;
-    const btns = row.querySelectorAll('button');
-    btns.forEach(b=> b.addEventListener('click', ()=>{
+    row.querySelectorAll('button').forEach(b=> b.addEventListener('click', ()=>{
       const who=b.dataset.who;
       if(who==='me'){ addXP('me',3); addFeed('summary','Me',`Followed debate: ${d.title}`); }
       else if(who==='partner'){ addXP('partner',3); addFeed('summary','Partner',`Followed debate: ${d.title}`); }
-      list.removeChild(row);
+      row.remove();
+      confetti(innerWidth-80, innerHeight-120, 50);
     }));
     list.appendChild(row);
   });
@@ -375,30 +442,46 @@ const sheet=$('sheet'), form=$('form');
 $('fab').addEventListener('click', ()=>{ sheet.classList.add('show'); form.innerHTML=''; $('saveBtn').style.display='none'; });
 $('closeSheet').addEventListener('click', ()=> sheet.classList.remove('show'));
 $('addApp').addEventListener('click', ()=>{
-  form.innerHTML = `<textarea id="t" placeholder="💚 1-2 sentences…"></textarea>`; $('saveBtn').style.display='inline-block';
-  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('appreciation','Me',v); addXP('me',1); sheet.classList.remove('show'); toast('Added'); };
+  form.innerHTML = `<textarea id="t" placeholder="💚 1–2 sentences…"></textarea>`; $('saveBtn').style.display='inline-block';
+  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('appreciation','Me',v); addXP('me',1); sheet.classList.remove('show'); toast('Added'); confetti(innerWidth-60, innerHeight-140, 40); };
 });
 $('addWish').addEventListener('click', ()=>{
-  form.innerHTML = `<textarea id="t" placeholder="🧸 I feel… when…, I’d love if…"></textarea>`; $('saveBtn').style.display='inline-block';
-  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('wish','Me',v); addXP('me',2); sheet.classList.remove('show'); toast('Added'); };
+  form.innerHTML = `<textarea id="t" placeholder="🧸 I feel… when… I’d love if…"></textarea>`; $('saveBtn').style.display='inline-block';
+  $('saveBtn').onclick=()=>{ const v=$('t').value.trim(); if(!v) return; addFeed('wish','Me',v); addXP('me',2); sheet.classList.remove('show'); toast('Added'); confetti(80, innerHeight-120, 50); };
 });
 $('addDeb').addEventListener('click', ()=>{
-  tabs.forEach(x=>x.classList.remove('active')); document.querySelector('[data-scr="debates"]').classList.add('active');
-  ['journey','daily','scores'].forEach(k=> document.getElementById('screen-'+k).style.display='none');
-  document.getElementById('screen-debates').style.display='block';
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-scr="debates"]').classList.add('active');
+  ['journey','scores'].forEach(k=> $('screen-'+k).style.display='none');
+  $('screen-debates').style.display='block';
   sheet.classList.remove('show');
 });
 
-/* ===== settings (names only for demo) ===== */
-$('settingsBtn').addEventListener('click', ()=>{
-  const newMe = prompt('Your display name', $('meName').textContent || 'You') || 'You';
-  const newPt = prompt('Partner display name', $('ptName').textContent || 'Partner') || 'Partner';
-  $('meName').textContent = newMe; $('ptName').textContent = newPt;
-  toast('Names saved');
+/* ===== names / avatars (simple) ===== */
+$('editNames').addEventListener('click', ()=>{
+  const me = prompt('Your name', $('meName').textContent || 'You') || 'You';
+  const pt = prompt('Partner name', $('ptName').textContent || 'Partner') || 'Partner';
+  $('meName').textContent = me; $('ptName').textContent = pt;
+  const meEmoji = prompt('Pick your avatar emoji (e.g., 🦊, 🐼, 🐸)', '🦊') || '🦊';
+  const ptEmoji = prompt('Partner avatar emoji', '🐣') || '🐣';
+  $('meAva').textContent = meEmoji; $('ptAva').textContent = ptEmoji;
+  toast('Saved');
 });
 
+/* ===== nav ===== */
+document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  const scr=b.dataset.scr;
+  ['journey','debates','scores'].forEach(k=> $('screen-'+k).style.display = (k===scr)?'block':'none');
+}));
+
 /* ===== start ===== */
-renderJourney(); renderBadges(); renderFeed(); renderDaily(); renderDebates();
+function start(){
+  placeNodes(); updateNodes(); renderFeed(); renderDebates();
+  // sweet entry confetti on first time
+  setTimeout(()=> confetti(innerWidth/2, innerHeight/3, 80), 500);
+}
+start();
 </script>
 </body>
 </html>
